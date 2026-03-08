@@ -1,0 +1,2321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #1a1a1a;
+            --bg-secondary: #252525;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #666666;
+            --border-color: #333333;
+            --accent-color: #5a6c7d;
+            --accent-hover: #4a5a6a;
+            --scrollbar-thumb: #444444;
+            --scrollbar-track: #1a1a1a;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        body.light-theme {
+            --bg-primary: #f5f5f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8e8;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #888888;
+            --border-color: #dddddd;
+            --scrollbar-thumb: #cccccc;
+            --scrollbar-track: #e8e8e8;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --accent-color: #5a6c7d;
+            --accent-hover: #4a5a6a;
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-primary);
+            font-family: 'Courier New', monospace;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar {
+            width: 380px;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background-color: var(--bg-secondary);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: transform 0.3s, width 0.3s, padding 0.3s, opacity 0.3s;
+        }
+
+        .sidebar.right-sidebar {
+            border-right: none;
+            border-left: 1px solid var(--border-color);
+        }
+
+        .sidebar.hidden {
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 10px;
+        }
+
+        .sidebar h2 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            white-space: nowrap;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .add-task-btn {
+            padding: 8px 16px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .add-task-btn:hover {
+            background-color: var(--bg-tertiary);
+        }
+
+        .todo-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .todo-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .todo-scroll-container::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 3px;
+        }
+
+        .todo-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
+        .date-group {
+            margin-bottom: 15px;
+        }
+
+        .date-group-header {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            padding: 8px 10px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .todo-item {
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            background-color: var(--bg-tertiary);
+            border-radius: 4px;
+            margin-bottom: 6px;
+            gap: 8px;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .todo-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .todo-checkbox {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--accent-color);
+            flex-shrink: 0;
+        }
+
+        .todo-text {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            word-break: break-word;
+        }
+
+        .todo-datetime {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            padding-left: 26px;
+        }
+
+        .todo-actions {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+            padding-left: 26px;
+        }
+
+        .todo-action-btn {
+            padding: 4px 8px;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.7rem;
+            transition: all 0.2s;
+        }
+
+        .todo-action-btn:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .todo-action-btn.delete:hover {
+            background-color: #f44336;
+        }
+
+        .todo-count {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .sidebar-toggle-container {
+            z-index: 50;
+        }
+
+        .sidebar-toggle-container.hidden {
+            display: none !important;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .clock {
+            font-size: 8rem;
+            color: var(--text-primary);
+            font-weight: bold;
+            text-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        .date {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .week-number {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+
+        .main-settings-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .main-settings-btn:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        /* World Clocks */
+        .world-clocks-section {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .world-clock-item {
+            position: relative;
+        }
+
+        .world-clock {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 12px 20px;
+            text-align: center;
+            min-width: 130px;
+            border: 1px solid var(--border-color);
+        }
+
+        .world-clock-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+        }
+
+        .world-clock-time {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .add-world-clock-btn {
+            background-color: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1.3rem;
+            transition: all 0.2s;
+            min-width: 130px;
+        }
+
+        .add-world-clock-btn:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+            background-color: var(--bg-tertiary);
+        }
+
+        .world-clock-remove {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: none;
+        }
+
+        .world-clock-item:hover .world-clock-remove {
+            display: block;
+        }
+
+        /* Bookmarks */
+        .bookmarks-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .bookmarks-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+        }
+
+        .bookmarks-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .bookmark-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .bookmark-item:hover {
+            transform: scale(1.1);
+        }
+
+        .bookmark-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            border: 2px solid var(--border-color);
+            transition: border-color 0.2s;
+        }
+
+        .bookmark-item:hover .bookmark-icon {
+            border-color: var(--text-secondary);
+        }
+
+        .bookmark-icon img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+        }
+
+        .bookmark-label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-align: center;
+            max-width: 55px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .add-bookmark-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+
+        .add-bookmark-btn:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-secondary);
+        }
+
+        .delete-bookmark-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            padding: 2px 6px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.6rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bookmark-item:hover .delete-bookmark-btn {
+            opacity: 1;
+        }
+
+        /* Prayer Times */
+        .prayer-times-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .prayer-countdown {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .prayer-countdown-label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-bottom: 5px;
+        }
+
+        .prayer-countdown-name {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .prayer-countdown-timer {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+
+        .prayer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .prayer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            padding: 10px 15px;
+            border-left: 3px solid transparent;
+        }
+
+        .prayer-item.next-prayer {
+            border-left-color: var(--accent-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .prayer-name {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .prayer-item.next-prayer .prayer-name {
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        .prayer-time {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .hadith-section {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .hadith-text {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.5;
+            font-style: italic;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .hadith-reference {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-align: right;
+        }
+
+        /* Quran Player */
+        .quran-player {
+            background-color: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+        }
+
+        .quran-player-title {
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quran-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .quran-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .quran-option input {
+            accent-color: var(--accent-color);
+            cursor: pointer;
+        }
+
+        .quran-select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.85rem;
+        }
+
+        .quran-select:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .quran-audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .quran-audio::-webkit-media-controls-panel {
+            background-color: var(--bg-secondary);
+        }
+
+        .playing-indicator {
+            color: var(--accent-color);
+            font-size: 0.75rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .playing-indicator.active {
+            display: block;
+        }
+
+        .prayer-location {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background-color: var(--bg-secondary);
+            padding: 25px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .modal-section-title {
+            color: var(--text-primary);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .modal-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .modal-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-input-row .modal-input {
+            flex: 1;
+        }
+
+        .modal-select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .modal-select:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .modal-select option {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .location-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .location-inputs .modal-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .auto-locate-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            transition: background-color 0.2s;
+        }
+
+        .auto-locate-btn:hover {
+            background-color: #1976D2;
+        }
+
+        .theme-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .theme-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-tertiary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .theme-option:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .theme-option.active {
+            border-color: var(--accent-color);
+            background-color: var(--bg-secondary);
+        }
+
+        .theme-option-icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .theme-option-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .sidebar-toggle-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .sidebar-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-toggle-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .toggle-btn {
+            padding: 6px 12px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .modal-btn.cancel {
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: var(--border-color);
+        }
+
+        .modal-btn.save {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .modal-btn.save:hover {
+            background-color: var(--accent-hover);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                max-height: 40vh;
+            }
+
+            .sidebar.right-sidebar {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                max-height: 50vh;
+            }
+
+            body {
+                flex-direction: column;
+            }
+
+            .clock {
+                font-size: 4rem;
+            }
+
+            .date {
+                font-size: 1.2rem;
+            }
+
+            .bookmarks-container {
+                gap: 10px;
+            }
+
+            .bookmark-icon {
+                width: 42px;
+                height: 42px;
+            }
+
+            .world-clocks-section {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar" id="leftSidebar">
+        <div class="sidebar-header">
+            <h2>Todo List</h2>
+        </div>
+        <button class="add-task-btn" id="openTaskModalBtn" style="margin-bottom: 10px;">+ Add Task</button>
+        <div class="todo-scroll-container" id="todoScrollContainer">
+            <div id="todoList"></div>
+        </div>
+        <div class="todo-count" id="todoCount"></div>
+    </aside>
+
+    <main class="main-content">
+        <div class="sidebar-toggle-container" style="position: absolute; left: 10px; top: 20px; display: flex; gap: 8px;">
+            <button class="icon-btn" id="toggleLeftSidebar" title="Toggle Todo List">▶</button>
+        </div>
+        <div class="sidebar-toggle-container" style="position: absolute; right: 10px; top: 20px; display: flex; gap: 8px;">
+            <button class="icon-btn" id="toggleRightSidebar" title="Toggle Prayer Times">◀</button>
+        </div>
+
+        <div class="container">
+            <div class="clock" id="clock">00:00:00</div>
+            <div class="date" id="date"></div>
+            <div class="week-number" id="weekNumber"></div>
+
+            <div class="world-clocks-section" id="worldClocksContainer"></div>
+
+            <div class="bookmarks-section">
+                <div class="bookmarks-label">Quick Access</div>
+                <div class="bookmarks-container" id="bookmarksContainer"></div>
+            </div>
+
+            <button class="main-settings-btn" id="openSettingsModal">
+                ⚙️ Settings
+            </button>
+        </div>
+    </main>
+
+    <aside class="sidebar right-sidebar" id="rightSidebar">
+        <div class="sidebar-header">
+            <h2>Prayer Times</h2>
+        </div>
+
+        <div class="prayer-countdown">
+            <div class="prayer-countdown-label">Next Prayer</div>
+            <div class="prayer-countdown-name" id="nextPrayerName">--</div>
+            <div class="prayer-countdown-timer" id="nextPrayerTimer">--:--:--</div>
+        </div>
+
+        <div class="prayer-list" id="prayerTimesList"></div>
+
+        <div class="quran-player">
+            <div class="quran-player-title">📖 Quran Audio</div>
+            <div class="quran-options">
+                <label class="quran-option">
+                    <input type="radio" name="quranMode" id="quranLoop" value="loop">
+                    <span>Loop</span>
+                </label>
+                <label class="quran-option">
+                    <input type="radio" name="quranMode" id="quranAutoNext" value="autoNext" checked>
+                    <span>Auto Next</span>
+                </label>
+            </div>
+            <select class="quran-select" id="surahSelect">
+                <option value="">Select Surah...</option>
+            </select>
+            <audio class="quran-audio" id="quranAudio" controls style="display:none;"></audio>
+            <div class="playing-indicator" id="playingIndicator">▶️ Playing...</div>
+        </div>
+
+        <div class="hadith-section">
+            <p class="hadith-text" id="hadithText">Loading hadith...</p>
+            <p class="hadith-reference" id="hadithReference"></p>
+        </div>
+
+        <div class="prayer-location" id="prayerLocation">Detecting location...</div>
+    </aside>
+
+    <!-- Task Modal -->
+    <div class="modal-overlay" id="taskModal">
+        <div class="modal">
+            <h3 id="taskModalTitle">Add New Task</h3>
+            <input type="hidden" id="editTaskId">
+            <input type="text" class="modal-input" id="taskInput" placeholder="Task description...">
+            <div class="modal-input-row">
+                <input type="date" class="modal-input" id="taskDateInput">
+                <input type="time" class="modal-input" id="taskTimeInput">
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelTaskBtn">Cancel</button>
+                <button class="modal-btn save" id="saveTaskBtn">Save Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bookmark Modal -->
+    <div class="modal-overlay" id="bookmarkModal">
+        <div class="modal">
+            <h3>Add Bookmark</h3>
+            <input type="text" class="modal-input" id="bookmarkName" placeholder="Name (e.g., Google)">
+            <input type="url" class="modal-input" id="bookmarkUrl" placeholder="URL (e.g., https://google.com)">
+            <input type="text" class="modal-input" id="bookmarkEmoji" placeholder="Emoji or icon (e.g., 🔍)">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelBookmarkBtn">Cancel</button>
+                <button class="modal-btn save" id="saveBookmarkBtn">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- World Clock Modal -->
+    <div class="modal-overlay" id="worldClockModal">
+        <div class="modal">
+            <h3>Add World Clock</h3>
+            <select class="modal-select" id="citySelect">
+                <option value="">Select a city...</option>
+                <option value="Asia/Dhaka">Dhaka, Bangladesh</option>
+                <option value="Europe/London">London, UK</option>
+                <option value="America/New_York">New York, USA</option>
+                <option value="America/Los_Angeles">Los Angeles, USA</option>
+                <option value="Europe/Paris">Paris, France</option>
+                <option value="Asia/Tokyo">Tokyo, Japan</option>
+                <option value="Asia/Dubai">Dubai, UAE</option>
+                <option value="Australia/Sydney">Sydney, Australia</option>
+                <option value="Asia/Singapore">Singapore</option>
+                <option value="Europe/Berlin">Berlin, Germany</option>
+                <option value="America/Toronto">Toronto, Canada</option>
+                <option value="Asia/Kolkata">Mumbai, India</option>
+                <option value="Asia/Bangkok">Bangkok, Thailand</option>
+                <option value="Europe/Moscow">Moscow, Russia</option>
+                <option value="America/Sao_Paulo">Sao Paulo, Brazil</option>
+            </select>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelWorldClockBtn">Cancel</button>
+                <button class="modal-btn save" id="saveWorldClockBtn">Add Clock</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <h3>⚙️ Settings</h3>
+
+            <div class="modal-section">
+                <div class="modal-section-title">🎨 Theme</div>
+                <div class="theme-options">
+                    <div class="theme-option" data-theme="auto">
+                        <div class="theme-option-icon">🔄</div>
+                        <div class="theme-option-label">Auto</div>
+                    </div>
+                    <div class="theme-option" data-theme="dark">
+                        <div class="theme-option-icon">🌙</div>
+                        <div class="theme-option-label">Dark</div>
+                    </div>
+                    <div class="theme-option" data-theme="light">
+                        <div class="theme-option-icon">☀️</div>
+                        <div class="theme-option-label">Light</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-section">
+                <div class="modal-section-title">🕌 Prayer Settings</div>
+
+                <label class="modal-label">Location</label>
+                <div class="location-inputs">
+                    <input type="text" class="modal-input" id="prayerLatitude" placeholder="Latitude">
+                    <input type="text" class="modal-input" id="prayerLongitude" placeholder="Longitude">
+                </div>
+                <button class="auto-locate-btn" id="autoLocateBtn">📍 Auto-Detect Location</button>
+
+                <label class="modal-label">Calculation Method</label>
+                <select class="modal-select" id="calculationMethod">
+                    <option value="1">Egyptian General Authority of Survey</option>
+                    <option value="2">Islamic Society of North America (ISNA)</option>
+                    <option value="3">Muslim World League</option>
+                    <option value="4">Umm al-Qura University, Makkah</option>
+                    <option value="5">University of Islamic Sciences, Karachi</option>
+                    <option value="7">Institute of Geophysics, University of Tehran</option>
+                    <option value="8">Majority</option>
+                    <option value="9">Kuwait</option>
+                    <option value="10">Qatar</option>
+                    <option value="11">Majlis Ugama Islam Singapura</option>
+                    <option value="12">Union Organization Islamic de France</option>
+                    <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
+                    <option value="14">Spiritual Administration of Muslims of Russia</option>
+                </select>
+
+                <label class="modal-label">Asr Calculation (Madhab)</label>
+                <select class="modal-select" id="asrMethod">
+                    <option value="0">Shafi'i, Maliki, Hanbali</option>
+                    <option value="1">Hanafi</option>
+                </select>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="closeSettingsBtn">Close</button>
+                <button class="modal-btn save" id="savePrayerSettingsBtn">Save Prayer Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Storage keys
+        const STORAGE_KEY = 'todoList';
+        const ALERTS_KEY = 'todoAlerts';
+        const BOOKMARKS_KEY = 'bookmarks';
+        const WORLD_CLOCKS_KEY = 'worldClocks';
+        const PRAYER_TIMES_KEY = 'prayerTimes';
+        const THEME_KEY = 'theme';
+        const SIDEBAR_KEY = 'sidebarState';
+
+        // DOM Elements
+        let prayerTimesList, nextPrayerName, nextPrayerTimer, prayerLocation;
+        let settingsModal, openSettingsBtn, closeSettingsBtn, savePrayerSettingsBtn;
+        let prayerLatitude, prayerLongitude, autoLocateBtn, calculationMethod, asrMethod;
+        let leftSidebar, rightSidebar;
+        let prayerTimesData = null;
+        let editingBookmarkId = null;
+        let editingTaskId = null;
+
+        // Generate unique ID
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Theme handling
+        function getPreferredTheme() {
+            const stored = localStorage.getItem(THEME_KEY);
+            return stored || 'auto';
+        }
+
+        function applyTheme(theme) {
+            const body = document.body;
+            body.classList.remove('light-theme');
+
+            if (theme === 'light') {
+                body.classList.add('light-theme');
+            } else if (theme === 'auto') {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+                    body.classList.add('light-theme');
+                }
+            }
+        }
+
+        function updateThemeOptions() {
+            const currentTheme = getPreferredTheme();
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+                if (option.dataset.theme === currentTheme) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        // Initialize theme
+        applyTheme(getPreferredTheme());
+
+        // Listen for system theme changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (getPreferredTheme() === 'auto') {
+                    applyTheme('auto');
+                }
+            });
+        }
+
+        // Sidebar state
+        function loadSidebarState() {
+            const stored = localStorage.getItem(SIDEBAR_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return { leftHidden: false, rightHidden: false };
+        }
+
+        function saveSidebarState(state) {
+            localStorage.setItem(SIDEBAR_KEY, JSON.stringify(state));
+        }
+
+        function updateSidebarUI() {
+            const state = loadSidebarState();
+
+            if (state.leftHidden) {
+                leftSidebar.classList.add('hidden');
+            } else {
+                leftSidebar.classList.remove('hidden');
+            }
+
+            if (state.rightHidden) {
+                rightSidebar.classList.add('hidden');
+            } else {
+                rightSidebar.classList.remove('hidden');
+            }
+
+            updateSidebarToggleButtons();
+        }
+
+        function updateSidebarToggleButtons() {
+            const state = loadSidebarState();
+            const leftBtn = document.getElementById('toggleLeftSidebar');
+            const rightBtn = document.getElementById('toggleRightSidebar');
+
+            if (leftBtn) {
+                leftBtn.textContent = state.leftHidden ? '◀' : '▶';
+                leftBtn.title = state.leftHidden ? 'Show Todo List' : 'Hide Todo List';
+            }
+            if (rightBtn) {
+                rightBtn.textContent = state.rightHidden ? '▶' : '◀';
+                rightBtn.title = state.rightHidden ? 'Show Prayer Times' : 'Hide Prayer Times';
+            }
+        }
+
+        // Clock functionality
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
+
+            const weekNum = getWeekNumber(now);
+            document.getElementById('weekNumber').textContent = `Week ${weekNum}`;
+
+            updateWorldClocks();
+            updatePrayerCountdown();
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // World Clocks
+        const worldClocksContainer = document.getElementById('worldClocksContainer');
+        const worldClockModal = document.getElementById('worldClockModal');
+        const citySelect = document.getElementById('citySelect');
+        const saveWorldClockBtn = document.getElementById('saveWorldClockBtn');
+        const cancelWorldClockBtn = document.getElementById('cancelWorldClockBtn');
+
+        function loadWorldClocks() {
+            const stored = localStorage.getItem(WORLD_CLOCKS_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveWorldClocks(clocks) {
+            localStorage.setItem(WORLD_CLOCKS_KEY, JSON.stringify(clocks));
+        }
+
+        function renderWorldClocks() {
+            const clocks = loadWorldClocks();
+            worldClocksContainer.innerHTML = '';
+
+            clocks.forEach(clock => {
+                const clockDiv = document.createElement('div');
+                clockDiv.className = 'world-clock-item';
+                clockDiv.dataset.timezone = clock.timezone;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'world-clock-remove';
+                removeBtn.textContent = '✕';
+                removeBtn.addEventListener('click', () => removeWorldClock(clock.id));
+
+                const clockInner = document.createElement('div');
+                clockInner.className = 'world-clock';
+
+                const label = document.createElement('div');
+                label.className = 'world-clock-label';
+                label.textContent = clock.label;
+
+                const time = document.createElement('div');
+                time.className = 'world-clock-time';
+                time.id = `wc-${clock.id}`;
+                time.textContent = '--:--';
+
+                clockInner.appendChild(label);
+                clockInner.appendChild(time);
+                clockDiv.appendChild(removeBtn);
+                clockDiv.appendChild(clockInner);
+                worldClocksContainer.appendChild(clockDiv);
+            });
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-world-clock-btn';
+            addBtn.textContent = '+';
+            addBtn.addEventListener('click', openWorldClockModal);
+            worldClocksContainer.appendChild(addBtn);
+        }
+
+        function updateWorldClocks() {
+            const clocks = loadWorldClocks();
+            const now = new Date();
+
+            clocks.forEach(clock => {
+                const timeEl = document.getElementById(`wc-${clock.id}`);
+                if (timeEl) {
+                    const options = {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                        timeZone: clock.timezone
+                    };
+                    timeEl.textContent = now.toLocaleTimeString('en-US', options);
+                }
+            });
+        }
+
+        function openWorldClockModal() {
+            citySelect.value = '';
+            worldClockModal.classList.add('active');
+        }
+
+        function closeWorldClockModal() {
+            worldClockModal.classList.remove('active');
+        }
+
+        function addWorldClock() {
+            const timezone = citySelect.value;
+            if (!timezone) {
+                alert('Please select a city');
+                return;
+            }
+
+            const clocks = loadWorldClocks();
+
+            if (clocks.some(c => c.timezone === timezone)) {
+                alert('This city is already added');
+                return;
+            }
+
+            const label = citySelect.options[citySelect.selectedIndex].text;
+
+            clocks.push({
+                id: generateId(),
+                timezone: timezone,
+                label: label.split(',')[0]
+            });
+
+            saveWorldClocks(clocks);
+            renderWorldClocks();
+            closeWorldClockModal();
+        }
+
+        function removeWorldClock(id) {
+            const clocks = loadWorldClocks();
+            const filtered = clocks.filter(c => c.id !== id);
+            saveWorldClocks(filtered);
+            renderWorldClocks();
+        }
+
+        saveWorldClockBtn.addEventListener('click', addWorldClock);
+        cancelWorldClockBtn.addEventListener('click', closeWorldClockModal);
+        worldClockModal.addEventListener('click', (e) => {
+            if (e.target === worldClockModal) {
+                closeWorldClockModal();
+            }
+        });
+
+        // Todo List
+        const todoList = document.getElementById('todoList');
+        const todoCount = document.getElementById('todoCount');
+
+        function loadTodos() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveTodos(todos) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+        }
+
+        function loadAlerts() {
+            const stored = localStorage.getItem(ALERTS_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveAlerts(alerts) {
+            localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts));
+        }
+
+        function formatDateTime(dateStr, timeStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            const formattedDate = date.toLocaleDateString('en-US', options);
+            const formattedTime = timeStr || '11:59 PM';
+            return `${formattedDate} at ${formattedTime}`;
+        }
+
+        function parseDateTime(dateStr, timeStr) {
+            if (!dateStr) return null;
+            const time = timeStr || '23:59';
+            return new Date(`${dateStr}T${time}`);
+        }
+
+        function getDateGroupLabel(dateStr) {
+            if (!dateStr) return 'No Deadline';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const taskDate = new Date(dateStr);
+            taskDate.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return 'Today';
+            if (diffDays === 1) return 'Tomorrow';
+            if (diffDays === -1) return 'Yesterday';
+            if (diffDays < 0) return 'Overdue';
+            if (diffDays <= 6) return `In ${diffDays} day${diffDays > 1 ? 's' : ''}`;
+
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            return taskDate.toLocaleDateString('en-US', options);
+        }
+
+        function getDateGroupSortKey(dateStr) {
+            if (!dateStr) return '9999-99-99';
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const taskDate = new Date(dateStr);
+            taskDate.setHours(0, 0, 0, 0);
+
+            const diffDays = Math.floor((taskDate - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return '0000-00-00';
+            if (diffDays === 1) return '0000-00-01';
+            if (diffDays > 1 && diffDays <= 6) return `0000-00-0${diffDays}`;
+            if (diffDays < 0) return `1000-00-00`;
+            return '9999-99-99';
+        }
+
+        function createTodoElement(todo) {
+            const li = document.createElement('div');
+            li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+            li.dataset.id = todo.id;
+
+            // Row 1: Checkbox and Title
+            const row1 = document.createElement('div');
+            row1.className = 'todo-row';
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'todo-checkbox';
+            checkbox.checked = todo.completed;
+            checkbox.addEventListener('change', () => toggleTodo(todo.id));
+
+            const span = document.createElement('span');
+            span.className = 'todo-text';
+            span.textContent = todo.text;
+
+            row1.appendChild(checkbox);
+            row1.appendChild(span);
+
+            li.appendChild(row1);
+
+            // Row 2: Date and Time (only if has deadline)
+            if (todo.deadlineDate) {
+                const datetimeDiv = document.createElement('div');
+                datetimeDiv.className = 'todo-datetime';
+                datetimeDiv.textContent = formatDateTime(todo.deadlineDate, todo.deadlineTime);
+                li.appendChild(datetimeDiv);
+            }
+
+            // Row 3: Actions
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'todo-actions';
+
+            const editBtn = document.createElement('button');
+            editBtn.className = 'todo-action-btn';
+            editBtn.textContent = 'Edit';
+            editBtn.addEventListener('click', () => openEditTaskModal(todo.id));
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'todo-action-btn delete';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.addEventListener('click', () => deleteTodo(todo.id));
+
+            actionsDiv.appendChild(editBtn);
+            actionsDiv.appendChild(deleteBtn);
+            li.appendChild(actionsDiv);
+
+            return li;
+        }
+
+        function renderTodos() {
+            const todos = loadTodos();
+
+            const incompleteTodos = todos.filter(t => !t.completed);
+            const completedTodos = todos.filter(t => t.completed);
+
+            incompleteTodos.sort((a, b) => {
+                const keyA = getDateGroupSortKey(a.deadlineDate) + (a.deadlineTime || '23:59');
+                const keyB = getDateGroupSortKey(b.deadlineDate) + (b.deadlineTime || '23:59');
+                return keyA.localeCompare(keyB);
+            });
+
+            todoList.innerHTML = '';
+
+            const groups = {};
+            incompleteTodos.forEach(todo => {
+                const groupKey = todo.deadlineDate || 'no-deadline';
+                const groupLabel = getDateGroupLabel(todo.deadlineDate);
+                if (!groups[groupKey]) {
+                    groups[groupKey] = { label: groupLabel, todos: [], sortKey: getDateGroupSortKey(todo.deadlineDate) };
+                }
+                groups[groupKey].todos.push(todo);
+            });
+
+            const sortedGroupKeys = Object.keys(groups).sort((a, b) => {
+                return groups[a].sortKey.localeCompare(groups[b].sortKey);
+            });
+
+            sortedGroupKeys.forEach(key => {
+                const group = groups[key];
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'date-group';
+
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'date-group-header';
+                headerDiv.textContent = `${group.label} (${group.todos.length})`;
+
+                groupDiv.appendChild(headerDiv);
+
+                group.todos.forEach(todo => {
+                    groupDiv.appendChild(createTodoElement(todo));
+                });
+
+                todoList.appendChild(groupDiv);
+            });
+
+            if (completedTodos.length > 0) {
+                const completedGroup = document.createElement('div');
+                completedGroup.className = 'date-group';
+
+                const completedHeader = document.createElement('div');
+                completedHeader.className = 'date-group-header';
+                completedHeader.textContent = `Completed (${completedTodos.length})`;
+
+                completedGroup.appendChild(completedHeader);
+
+                completedTodos.forEach(todo => {
+                    completedGroup.appendChild(createTodoElement(todo));
+                });
+
+                todoList.appendChild(completedGroup);
+            }
+
+            updateCount();
+        }
+
+        function openTaskModal() {
+            editingTaskId = null;
+            document.getElementById('taskModalTitle').textContent = 'Add New Task';
+            document.getElementById('taskInput').value = '';
+            document.getElementById('taskDateInput').value = '';
+            document.getElementById('taskTimeInput').value = '';
+            document.getElementById('editTaskId').value = '';
+            document.getElementById('taskModal').classList.add('active');
+            document.getElementById('taskInput').focus();
+        }
+
+        function openEditTaskModal(id) {
+            const todos = loadTodos();
+            const todo = todos.find(t => t.id === id);
+            if (!todo) return;
+
+            editingTaskId = id;
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+            document.getElementById('taskInput').value = todo.text;
+            document.getElementById('taskDateInput').value = todo.deadlineDate || '';
+            document.getElementById('taskTimeInput').value = todo.deadlineTime || '';
+            document.getElementById('editTaskId').value = id;
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        function saveTask() {
+            const text = document.getElementById('taskInput').value.trim();
+            if (text === '') return;
+
+            const todos = loadTodos();
+
+            if (editingTaskId) {
+                const todo = todos.find(t => t.id === editingTaskId);
+                if (todo) {
+                    todo.text = text;
+                    todo.deadlineDate = document.getElementById('taskDateInput').value || null;
+                    todo.deadlineTime = document.getElementById('taskTimeInput').value || '23:59';
+                    todo.deadline = !!todo.deadlineDate;
+                }
+            } else {
+                todos.push({
+                    id: generateId(),
+                    text: text,
+                    completed: false,
+                    deadline: !!document.getElementById('taskDateInput').value,
+                    deadlineDate: document.getElementById('taskDateInput').value || null,
+                    deadlineTime: document.getElementById('taskTimeInput').value || '23:59'
+                });
+            }
+
+            saveTodos(todos);
+            renderTodos();
+            closeTaskModal();
+        }
+
+        function toggleTodo(id) {
+            const todos = loadTodos();
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = !todo.completed;
+                saveTodos(todos);
+                renderTodos();
+            }
+        }
+
+        function deleteTodo(id) {
+            const todos = loadTodos();
+            const filtered = todos.filter(t => t.id !== id);
+            saveTodos(filtered);
+
+            const alerts = loadAlerts();
+            const filteredAlerts = alerts.filter(a => a.id !== id);
+            saveAlerts(filteredAlerts);
+
+            renderTodos();
+        }
+
+        function updateCount() {
+            const todos = loadTodos();
+            const total = todos.length;
+            const completed = todos.filter(t => t.completed).length;
+            const remaining = total - completed;
+            todoCount.textContent = `${remaining} task${remaining !== 1 ? 's' : ''} remaining`;
+        }
+
+        // Task modal event listeners
+        document.getElementById('openTaskModalBtn').addEventListener('click', openTaskModal);
+        document.getElementById('cancelTaskBtn').addEventListener('click', closeTaskModal);
+        document.getElementById('saveTaskBtn').addEventListener('click', saveTask);
+        document.getElementById('taskModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('taskModal')) {
+                closeTaskModal();
+            }
+        });
+
+        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('taskDateInput').focus();
+            }
+        });
+
+        // Bookmarks
+        const bookmarksContainer = document.getElementById('bookmarksContainer');
+        const bookmarkModal = document.getElementById('bookmarkModal');
+        const bookmarkNameInput = document.getElementById('bookmarkName');
+        const bookmarkUrlInput = document.getElementById('bookmarkUrl');
+        const bookmarkEmojiInput = document.getElementById('bookmarkEmoji');
+        const saveBookmarkBtn = document.getElementById('saveBookmarkBtn');
+        const cancelBookmarkBtn = document.getElementById('cancelBookmarkBtn');
+
+        function loadBookmarks() {
+            const stored = localStorage.getItem(BOOKMARKS_KEY);
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveBookmarks(bookmarks) {
+            localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(bookmarks));
+        }
+
+        function renderBookmarks() {
+            const bookmarks = loadBookmarks();
+            bookmarksContainer.innerHTML = '';
+
+            bookmarks.forEach(bookmark => {
+                const link = document.createElement('a');
+                link.className = 'bookmark-item';
+                link.href = bookmark.url;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+
+                const icon = document.createElement('div');
+                icon.className = 'bookmark-icon';
+
+                if (bookmark.emoji) {
+                    icon.textContent = bookmark.emoji;
+                } else {
+                    const img = document.createElement('img');
+                    img.src = `https://www.google.com/s2/favicons?domain=${encodeURIComponent(bookmark.url)}&sz=64`;
+                    img.alt = bookmark.name.charAt(0);
+                    icon.appendChild(img);
+                }
+
+                const label = document.createElement('span');
+                label.className = 'bookmark-label';
+                label.textContent = bookmark.name;
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-bookmark-btn';
+                deleteBtn.textContent = '✕';
+                deleteBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteBookmark(bookmark.id);
+                });
+
+                link.appendChild(icon);
+                link.appendChild(label);
+                link.appendChild(deleteBtn);
+                bookmarksContainer.appendChild(link);
+            });
+
+            const addBtn = document.createElement('button');
+            addBtn.className = 'add-bookmark-btn';
+            addBtn.textContent = '+';
+            addBtn.addEventListener('click', openBookmarkModal);
+            bookmarksContainer.appendChild(addBtn);
+        }
+
+        function openBookmarkModal() {
+            editingBookmarkId = null;
+            bookmarkNameInput.value = '';
+            bookmarkUrlInput.value = '';
+            bookmarkEmojiInput.value = '';
+            bookmarkModal.classList.add('active');
+            bookmarkNameInput.focus();
+        }
+
+        function closeBookmarkModal() {
+            bookmarkModal.classList.remove('active');
+        }
+
+        function saveBookmark() {
+            const name = bookmarkNameInput.value.trim();
+            let url = bookmarkUrlInput.value.trim();
+            const emoji = bookmarkEmojiInput.value.trim();
+
+            if (!name || !url) {
+                alert('Please fill in name and URL');
+                return;
+            }
+
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            const bookmarks = loadBookmarks();
+
+            if (editingBookmarkId) {
+                const bookmark = bookmarks.find(b => b.id === editingBookmarkId);
+                if (bookmark) {
+                    bookmark.name = name;
+                    bookmark.url = url;
+                    bookmark.emoji = emoji;
+                }
+            } else {
+                bookmarks.push({
+                    id: generateId(),
+                    name: name,
+                    url: url,
+                    emoji: emoji
+                });
+            }
+
+            saveBookmarks(bookmarks);
+            renderBookmarks();
+            closeBookmarkModal();
+        }
+
+        function deleteBookmark(id) {
+            const bookmarks = loadBookmarks();
+            const filtered = bookmarks.filter(b => b.id !== id);
+            saveBookmarks(filtered);
+            renderBookmarks();
+        }
+
+        saveBookmarkBtn.addEventListener('click', saveBookmark);
+        cancelBookmarkBtn.addEventListener('click', closeBookmarkModal);
+        bookmarkModal.addEventListener('click', (e) => {
+            if (e.target === bookmarkModal) {
+                closeBookmarkModal();
+            }
+        });
+
+        // Prayer Times
+        prayerTimesList = document.getElementById('prayerTimesList');
+        nextPrayerName = document.getElementById('nextPrayerName');
+        nextPrayerTimer = document.getElementById('nextPrayerTimer');
+        prayerLocation = document.getElementById('prayerLocation');
+        settingsModal = document.getElementById('settingsModal');
+        openSettingsBtn = document.getElementById('openSettingsModal');
+        closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        savePrayerSettingsBtn = document.getElementById('savePrayerSettingsBtn');
+        prayerLatitude = document.getElementById('prayerLatitude');
+        prayerLongitude = document.getElementById('prayerLongitude');
+        autoLocateBtn = document.getElementById('autoLocateBtn');
+        calculationMethod = document.getElementById('calculationMethod');
+        asrMethod = document.getElementById('asrMethod');
+        leftSidebar = document.getElementById('leftSidebar');
+        rightSidebar = document.getElementById('rightSidebar');
+
+        const DEFAULT_PRAYER_SETTINGS = {
+            latitude: null,
+            longitude: null,
+            method: 2,
+            asrMethod: 0
+        };
+
+        // Hadiths collection
+        const hadiths = [
+            { text: "The seeking of knowledge is obligatory for every Muslim.", reference: "Sunan Ibn Majah 224" },
+            { text: "He who is not grateful to the people, is not grateful to Allah.", reference: "Sunan Abi Dawud 4811" },
+            { text: "The best among you are those who have the best manners and character.", reference: "Sahih al-Bukhari 3559" },
+            { text: "Kindness is a mark of faith, and whoever has not kindness has not faith.", reference: "Sahih Muslim 2553" },
+            { text: "None of you truly believes until he wishes for his brother what he wishes for himself.", reference: "Sahih al-Bukhari 13" },
+            { text: "The strong is not the one who overcomes the people by his strength, but the strong is the one who controls himself while in anger.", reference: "Sahih al-Bukhari 6114" },
+            { text: "A good word is charity.", reference: "Sahih al-Bukhari 2989" },
+            { text: "The believer is not one who eats his fill while his neighbor goes hungry.", reference: "Al-Adab Al-Mufrad 112" },
+            { text: "Remove harmful things from the road, it is charity.", reference: "Sahih al-Bukhari 2989" },
+            { text: "Smiling in the face of your brother is charity.", reference: "Jami at-Tirmidhi 1956" },
+            { text: "Whoever relieves a believer's distress in this world, Allah will relieve his distress on the Day of Resurrection.", reference: "Sahih Muslim 2699" },
+            { text: "Actions are but by intentions and every man shall have but that which he intended.", reference: "Sahih al-Bukhari 1" },
+            { text: "The most beloved of deeds to Allah are those that are most consistent, even if they are small.", reference: "Sahih al-Bukhari 6464" },
+            { text: "Richness is not having many possessions, but richness is being content with oneself.", reference: "Sahih al-Bukhari 6446" },
+            { text: "Whoever believes in Allah and the Last Day should speak good or remain silent.", reference: "Sahih al-Bukhari 6475" }
+        ];
+
+        function getHadithForPeriod() {
+            const now = new Date();
+            const hour = now.getHours();
+            const period = Math.floor(hour / 6);
+            const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+            const index = (dayOfYear * 4 + period) % hadiths.length;
+            return hadiths[index];
+        }
+
+        function displayHadith() {
+            const hadith = getHadithForPeriod();
+            document.getElementById('hadithText').textContent = `"${hadith.text}"`;
+            document.getElementById('hadithReference').textContent = hadith.reference;
+        }
+
+        // Quran Surah list (114 Surahs)
+        const surahNames = [
+            "Al-Fatiha", "Al-Baqarah", "Ali 'Imran", "An-Nisa", "Al-Ma'idah", "Al-An'am", "Al-A'raf", "Al-Anfal", "At-Tawbah", "Yunus",
+            "Hud", "Yusuf", "Ar-Ra'd", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Taha",
+            "Al-Anbya", "Al-Hajj", "Al-Mu'minun", "An-Nur", "Al-Furqan", "Ash-Shu'ara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum",
+            "Luqman", "As-Sajdah", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir",
+            "Fussilat", "Ash-Shuraa", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf",
+            "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqi'ah", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahanah",
+            "As-Saff", "Al-Jumu'ah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Ma'arij",
+            "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Nazi'at", "Abasa",
+            "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-A'la", "Al-Ghashiyah", "Al-Fajr", "Al-Balad",
+            "Ash-Shams", "Al-Layl", "Ad-Duhaa", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat",
+            "Al-Qari'ah", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Ma'un", "Al-Kawthar", "Al-Kafirun", "An-Nasr",
+            "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+        ];
+
+        // Initialize Quran player
+        function initQuranPlayer() {
+            const surahSelect = document.getElementById('surahSelect');
+            const quranAudio = document.getElementById('quranAudio');
+            const playingIndicator = document.getElementById('playingIndicator');
+            const quranLoop = document.getElementById('quranLoop');
+            const quranAutoNext = document.getElementById('quranAutoNext');
+
+            // Populate Surah dropdown
+            surahNames.forEach((name, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.textContent = `${index + 1}. ${name}`;
+                surahSelect.appendChild(option);
+            });
+
+            // Handle Surah selection
+            surahSelect.addEventListener('change', () => {
+                const surahNum = surahSelect.value;
+                if (surahNum) {
+                    // Use Alafasy recitation from alquran.cloud API
+                    quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNum}.mp3`;
+                    quranAudio.style.display = 'block';
+                    quranAudio.play().catch(e => {
+                        console.log('Audio playback failed:', e);
+                        // Fallback to second source
+                        quranAudio.src = `https://server8.mp3quran.net/afs/${String(surahNum).padStart(3, '0')}.mp3`;
+                        quranAudio.play();
+                    });
+                } else {
+                    quranAudio.style.display = 'none';
+                    quranAudio.pause();
+                }
+            });
+
+            // Handle play/pause
+            quranAudio.addEventListener('play', () => {
+                playingIndicator.classList.add('active');
+            });
+
+            quranAudio.addEventListener('pause', () => {
+                playingIndicator.classList.remove('active');
+            });
+
+            // Handle end - loop or play next
+            quranAudio.addEventListener('ended', () => {
+                playingIndicator.classList.remove('active');
+
+                // Check if loop is enabled
+                if (quranLoop.checked) {
+                    quranAudio.currentTime = 0;
+                    quranAudio.play();
+                    return;
+                }
+
+                // Check if auto next is enabled
+                if (quranAutoNext.checked && surahSelect.value) {
+                    const currentSurah = parseInt(surahSelect.value);
+                    if (currentSurah < surahNames.length) {
+                        // Play next Surah
+                        const nextSurah = currentSurah + 1;
+                        surahSelect.value = nextSurah;
+                        quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${nextSurah}.mp3`;
+                        quranAudio.play().catch(e => {
+                            console.log('Audio playback failed:', e);
+                            quranAudio.src = `https://server8.mp3quran.net/afs/${String(nextSurah).padStart(3, '0')}.mp3`;
+                            quranAudio.play();
+                        });
+                    }
+                }
+            });
+        }
+
+        function loadPrayerSettings() {
+            const stored = localStorage.getItem(PRAYER_TIMES_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+            return DEFAULT_PRAYER_SETTINGS;
+        }
+
+        function savePrayerSettings(settings) {
+            localStorage.setItem(PRAYER_TIMES_KEY, JSON.stringify(settings));
+        }
+
+        async function fetchPrayerTimes() {
+            const settings = loadPrayerSettings();
+            const date = new Date();
+
+            displayHadith();
+
+            if (settings.latitude && settings.longitude) {
+                const url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}?latitude=${settings.latitude}&longitude=${settings.longitude}&method=${settings.method}&school=${settings.asrMethod}`;
+                try {
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.code === 200) {
+                        prayerTimesData = data.data.timings;
+                        prayerLocation.textContent = `Location: ${settings.latitude.toFixed(2)}, ${settings.longitude.toFixed(2)}`;
+                        renderPrayerTimes();
+                    }
+                } catch (error) {
+                    console.error('Error fetching prayer times:', error);
+                }
+            } else {
+                prayerLocation.textContent = 'Getting location...';
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => {
+                            const lat = position.coords.latitude;
+                            const lng = position.coords.longitude;
+
+                            settings.latitude = lat;
+                            settings.longitude = lng;
+                            savePrayerSettings(settings);
+
+                            const url = `https://api.aladhan.com/v1/timings/${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}?latitude=${lat}&longitude=${lng}&method=${settings.method}&school=${settings.asrMethod}`;
+                            try {
+                                const response = await fetch(url);
+                                const data = await response.json();
+                                if (data.code === 200) {
+                                    prayerTimesData = data.data.timings;
+                                    prayerLocation.textContent = 'Location auto-detected';
+                                    renderPrayerTimes();
+                                }
+                            } catch (error) {
+                                console.error('Error fetching prayer times:', error);
+                                prayerLocation.textContent = 'Error loading prayer times';
+                            }
+                        },
+                        (error) => {
+                            console.error('Location error:', error);
+                            prayerLocation.textContent = 'Location access denied. Set manually in settings.';
+                        }
+                    );
+                } else {
+                    prayerLocation.textContent = 'Geolocation not supported';
+                }
+            }
+        }
+
+        function renderPrayerTimes() {
+            if (!prayerTimesData) return;
+
+            const prayers = [
+                { name: 'Fajr', key: 'Fajr' },
+                { name: 'Sunrise', key: 'Sunrise' },
+                { name: 'Dhuhr', key: 'Dhuhr' },
+                { name: 'Asr', key: 'Asr' },
+                { name: 'Maghrib', key: 'Maghrib' },
+                { name: 'Isha', key: 'Isha' }
+            ];
+
+            const nextPrayer = findNextPrayer(new Date());
+
+            let html = '';
+            prayers.forEach(prayer => {
+                const time12 = convertTo12Hour(prayerTimesData[prayer.key]);
+                const isNext = nextPrayer && nextPrayer.name === prayer.name;
+
+                let className = 'prayer-item';
+                if (isNext) className += ' next-prayer';
+
+                html += `<div class="${className}">
+                    <span class="prayer-name">${prayer.name}</span>
+                    <span class="prayer-time">${time12}</span>
+                </div>`;
+            });
+
+            prayerTimesList.innerHTML = html;
+        }
+
+        function convertTo12Hour(time24) {
+            const [hours, minutes] = time24.split(':');
+            let h = parseInt(hours);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            h = h % 12;
+            h = h ? h : 12;
+            return `${h}:${minutes} ${ampm}`;
+        }
+
+        function getPrayerTimeToday(prayerKey) {
+            if (!prayerTimesData || !prayerTimesData[prayerKey]) return null;
+            const time = prayerTimesData[prayerKey];
+            const [hours, minutes] = time.split(':');
+            const now = new Date();
+            const prayerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(hours), parseInt(minutes));
+            return prayerTime;
+        }
+
+        function findNextPrayer(now) {
+            if (!prayerTimesData) return null;
+
+            const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+
+            for (const prayer of prayers) {
+                const prayerTime = getPrayerTimeToday(prayer);
+                if (prayerTime && prayerTime > now) {
+                    return { name: prayer, time: prayerTime };
+                }
+            }
+
+            return { name: 'Fajr', time: getPrayerTimeToday('Fajr'), tomorrow: true };
+        }
+
+        function updatePrayerCountdown() {
+            if (!nextPrayerName || !nextPrayerTimer) return;
+
+            if (!prayerTimesData) {
+                nextPrayerName.textContent = '--';
+                nextPrayerTimer.textContent = '--:--:--';
+                return;
+            }
+
+            const now = new Date();
+            const nextPrayer = findNextPrayer(now);
+
+            if (nextPrayer) {
+                nextPrayerName.textContent = nextPrayer.name;
+
+                let targetTime = nextPrayer.time;
+                if (nextPrayer.tomorrow) {
+                    targetTime = new Date(targetTime.getTime() + 24 * 60 * 60 * 1000);
+                }
+
+                const diff = targetTime - now;
+                if (diff > 0) {
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                    nextPrayerTimer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                } else {
+                    fetchPrayerTimes();
+                }
+            }
+        }
+
+        function openSettingsModal() {
+            const settings = loadPrayerSettings();
+            prayerLatitude.value = settings.latitude || '';
+            prayerLongitude.value = settings.longitude || '';
+            calculationMethod.value = settings.method || 2;
+            asrMethod.value = settings.asrMethod !== undefined ? settings.asrMethod : 0;
+
+            updateThemeOptions();
+            updateSidebarUI();
+
+            settingsModal.classList.add('active');
+        }
+
+        function closeSettingsModalFunc() {
+            settingsModal.classList.remove('active');
+        }
+
+        function savePrayerSettingsHandler() {
+            const lat = parseFloat(prayerLatitude.value);
+            const lng = parseFloat(prayerLongitude.value);
+            const method = parseInt(calculationMethod.value);
+            const asr = parseInt(asrMethod.value);
+
+            if (isNaN(lat) || isNaN(lng)) {
+                alert('Please enter valid coordinates');
+                return;
+            }
+
+            const settings = {
+                latitude: lat,
+                longitude: lng,
+                method: method,
+                asrMethod: asr
+            };
+
+            savePrayerSettings(settings);
+            prayerTimesData = null;
+            fetchPrayerTimes();
+            closeSettingsModalFunc();
+        }
+
+        async function autoDetectLocation() {
+            if (!navigator.geolocation) {
+                alert('Geolocation is not supported by your browser');
+                return;
+            }
+
+            autoLocateBtn.textContent = '⏳ Detecting...';
+
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    prayerLatitude.value = position.coords.latitude.toFixed(6);
+                    prayerLongitude.value = position.coords.longitude.toFixed(6);
+                    autoLocateBtn.textContent = '📍 Auto-Detect Location';
+                },
+                (error) => {
+                    alert('Unable to get your location. Please enter coordinates manually.');
+                    autoLocateBtn.textContent = '📍 Auto-Detect Location';
+                }
+            );
+        }
+
+        // Theme options
+        document.querySelectorAll('.theme-option').forEach(option => {
+            option.addEventListener('click', () => {
+                const theme = option.dataset.theme;
+                localStorage.setItem(THEME_KEY, theme);
+                applyTheme(theme);
+                updateThemeOptions();
+            });
+        });
+
+        // Sidebar toggles
+        document.getElementById('toggleLeftSidebar').addEventListener('click', () => {
+            const state = loadSidebarState();
+            state.leftHidden = !state.leftHidden;
+            saveSidebarState(state);
+            updateSidebarUI();
+        });
+
+        document.getElementById('toggleRightSidebar').addEventListener('click', () => {
+            const state = loadSidebarState();
+            state.rightHidden = !state.rightHidden;
+            saveSidebarState(state);
+            updateSidebarUI();
+        });
+
+        // Settings modal event listeners
+        openSettingsBtn.addEventListener('click', openSettingsModal);
+        closeSettingsBtn.addEventListener('click', closeSettingsModalFunc);
+        savePrayerSettingsBtn.addEventListener('click', savePrayerSettingsHandler);
+        autoLocateBtn.addEventListener('click', autoDetectLocation);
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                closeSettingsModalFunc();
+            }
+        });
+
+        // Initial renders
+        renderTodos();
+        renderBookmarks();
+        renderWorldClocks();
+        fetchPrayerTimes();
+        displayHadith();
+        initQuranPlayer();
+
+        // Check alerts every minute
+        setInterval(() => {
+            const todos = loadTodos();
+            const alerts = loadAlerts();
+            const now = new Date();
+
+            todos.forEach(todo => {
+                if (todo.completed || !todo.deadline || !todo.deadlineDate) return;
+                if (alerts.find(a => a.id === todo.id)) return;
+
+                const deadlineDate = parseDateTime(todo.deadlineDate, todo.deadlineTime);
+                const diffMs = deadlineDate - now;
+                const diffHours = diffMs / (1000 * 60 * 60);
+
+                if (diffMs > 0 && diffHours <= 1) {
+                    if (Notification.permission === 'granted') {
+                        new Notification('Task Due Soon!', {
+                            body: `"${todo.text}" is due soon`,
+                            icon: '⏰'
+                        });
+                    } else if (Notification.permission !== 'denied') {
+                        Notification.requestPermission();
+                    }
+                    alerts.push({ id: todo.id, alertedAt: now.toISOString() });
+                    saveAlerts(alerts);
+                }
+            });
+        }, 60000);
+
+        // Request notification permission
+        if (Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+    </script>
+</body>
+</html>
