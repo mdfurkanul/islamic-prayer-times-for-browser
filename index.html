@@ -695,12 +695,20 @@
             display: flex;
         }
 
+        /* Manage modals (opened from settings) have higher z-index */
+        #manageWorldClocksModal.modal-overlay,
+        #manageBookmarksModal.modal-overlay,
+        #worldClockModal.modal-overlay,
+        #bookmarkModal.modal-overlay {
+            z-index: 1100;
+        }
+
         .modal {
             background-color: var(--bg-secondary);
             padding: 25px;
             border-radius: 8px;
-            width: 90%;
-            max-width: 420px;
+            width: 95%;
+            max-width: 580px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -923,6 +931,47 @@
             background-color: var(--accent-hover);
         }
 
+        /* Tabbed Settings */
+        .settings-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .settings-tab {
+            padding: 8px 16px;
+            background-color: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .settings-tab:hover {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .settings-tab.active {
+            background-color: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .settings-tab-content {
+            display: none;
+        }
+
+        .settings-tab-content.active {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -1080,21 +1129,115 @@
             <h3>Add World Clock</h3>
             <select class="modal-select" id="citySelect">
                 <option value="">Select a city...</option>
+                <!-- Middle East -->
+                <option value="Asia/Riyadh">Makkah, Saudi Arabia</option>
+                <option value="Asia/Riyadh">Madinah, Saudi Arabia</option>
+                <option value="Asia/Dubai">Dubai, UAE</option>
+                <option value="Asia/Qatar">Doha, Qatar</option>
+                <option value="Asia/Kuwait">Kuwait City, Kuwait</option>
+                <option value="Asia/Bahrain">Manama, Bahrain</option>
+                <option value="Asia/Muscat">Muscat, Oman</option>
+                <option value="Asia/Amman">Amman, Jordan</option>
+                <option value="Asia/Beirut">Beirut, Lebanon</option>
+                <option value="Asia/Damascus">Damascus, Syria</option>
+                <option value="Asia/Baghdad">Baghdad, Iraq</option>
+                <option value="Asia/Tehran">Tehran, Iran</option>
+                <option value="Asia/Jerusalem">Jerusalem, Palestine</option>
+                <!-- Asia -->
                 <option value="Asia/Dhaka">Dhaka, Bangladesh</option>
+                <option value="Asia/Kolkata">Mumbai, India</option>
+                <option value="Asia/Karachi">Karachi, Pakistan</option>
+                <option value="Asia/Lahore">Lahore, Pakistan</option>
+                <option value="Asia/Tokyo">Tokyo, Japan</option>
+                <option value="Asia/Seoul">Seoul, South Korea</option>
+                <option value="Asia/Shanghai">Shanghai, China</option>
+                <option value="Asia/Hong_Kong">Hong Kong</option>
+                <option value="Asia/Singapore">Singapore</option>
+                <option value="Asia/Kuala_Lumpur">Kuala Lumpur, Malaysia</option>
+                <option value="Asia/Jakarta">Jakarta, Indonesia</option>
+                <option value="Asia/Bangkok">Bangkok, Thailand</option>
+                <option value="Asia/Ho_Chi_Minh">Ho Chi Minh, Vietnam</option>
+                <option value="Asia/Manila">Manila, Philippines</option>
+                <option value="Asia/Taipei">Taipei, Taiwan</option>
+                <option value="Asia/Yangon">Yangon, Myanmar</option>
+                <option value="Asia/Kathmandu">Kathmandu, Nepal</option>
+                <option value="Asia/Colombo">Colombo, Sri Lanka</option>
+                <option value="Asia/Tashkent">Tashkent, Uzbekistan</option>
+                <option value="Asia/Almaty">Almaty, Kazakhstan</option>
+                <option value="Asia/Kabul">Kabul, Afghanistan</option>
+                <!-- Europe -->
                 <option value="Europe/London">London, UK</option>
+                <option value="Europe/Paris">Paris, France</option>
+                <option value="Europe/Berlin">Berlin, Germany</option>
+                <option value="Europe/Rome">Rome, Italy</option>
+                <option value="Europe/Madrid">Madrid, Spain</option>
+                <option value="Europe/Lisbon">Lisbon, Portugal</option>
+                <option value="Europe/Amsterdam">Amsterdam, Netherlands</option>
+                <option value="Europe/Brussels">Brussels, Belgium</option>
+                <option value="Europe/Vienna">Vienna, Austria</option>
+                <option value="Europe/Zurich">Zurich, Switzerland</option>
+                <option value="Europe/Stockholm">Stockholm, Sweden</option>
+                <option value="Europe/Oslo">Oslo, Norway</option>
+                <option value="Europe/Copenhagen">Copenhagen, Denmark</option>
+                <option value="Europe/Helsinki">Helsinki, Finland</option>
+                <option value="Europe/Warsaw">Warsaw, Poland</option>
+                <option value="Europe/Prague">Prague, Czech Republic</option>
+                <option value="Europe/Budapest">Budapest, Hungary</option>
+                <option value="Europe/Bucharest">Bucharest, Romania</option>
+                <option value="Europe/Sofia">Sofia, Bulgaria</option>
+                <option value="Europe/Athens">Athens, Greece</option>
+                <option value="Europe/Istanbul">Istanbul, Turkey</option>
+                <option value="Europe/Moscow">Moscow, Russia</option>
+                <option value="Europe/Kyiv">Kiev, Ukraine</option>
+                <!-- North America -->
                 <option value="America/New_York">New York, USA</option>
                 <option value="America/Los_Angeles">Los Angeles, USA</option>
-                <option value="Europe/Paris">Paris, France</option>
-                <option value="Asia/Tokyo">Tokyo, Japan</option>
-                <option value="Asia/Dubai">Dubai, UAE</option>
-                <option value="Australia/Sydney">Sydney, Australia</option>
-                <option value="Asia/Singapore">Singapore</option>
-                <option value="Europe/Berlin">Berlin, Germany</option>
+                <option value="America/Chicago">Chicago, USA</option>
+                <option value="America/Houston">Houston, USA</option>
+                <option value="America/Phoenix">Phoenix, USA</option>
+                <option value="America/Denver">Denver, USA</option>
+                <option value="America/Seattle">Seattle, USA</option>
+                <option value="America/Miami">Miami, USA</option>
+                <option value="America/Boston">Boston, USA</option>
+                <option value="America/San_Francisco">San Francisco, USA</option>
+                <option value="America/Las_Vegas">Las Vegas, USA</option>
                 <option value="America/Toronto">Toronto, Canada</option>
-                <option value="Asia/Kolkata">Mumbai, India</option>
-                <option value="Asia/Bangkok">Bangkok, Thailand</option>
-                <option value="Europe/Moscow">Moscow, Russia</option>
+                <option value="America/Vancouver">Vancouver, Canada</option>
+                <option value="America/Montreal">Montreal, Canada</option>
+                <option value="America/Ottawa">Ottawa, Canada</option>
+                <option value="America/Mexico_City">Mexico City, Mexico</option>
+                <!-- South America -->
                 <option value="America/Sao_Paulo">Sao Paulo, Brazil</option>
+                <option value="America/Rio_de_Janeiro">Rio de Janeiro, Brazil</option>
+                <option value="America/Argentina/Buenos_Aires">Buenos Aires, Argentina</option>
+                <option value="America/Bogota">Bogota, Colombia</option>
+                <option value="America/Lima">Lima, Peru</option>
+                <option value="America/Santiago">Santiago, Chile</option>
+                <option value="America/Caracas">Caracas, Venezuela</option>
+                <!-- Africa -->
+                <option value="Africa/Cairo">Cairo, Egypt</option>
+                <option value="Africa/Lagos">Lagos, Nigeria</option>
+                <option value="Africa/Johannesburg">Johannesburg, South Africa</option>
+                <option value="Africa/Nairobi">Nairobi, Kenya</option>
+                <option value="Africa/Casablanca">Casablanca, Morocco</option>
+                <option value="Africa/Tunis">Tunis, Tunisia</option>
+                <option value="Africa/Algiers">Algiers, Algeria</option>
+                <option value="Africa/Addis_Ababa">Addis Ababa, Ethiopia</option>
+                <option value="Africa/Dakar">Dakar, Senegal</option>
+                <option value="Africa/Accra">Accra, Ghana</option>
+                <!-- Oceania -->
+                <option value="Australia/Sydney">Sydney, Australia</option>
+                <option value="Australia/Melbourne">Melbourne, Australia</option>
+                <option value="Australia/Brisbane">Brisbane, Australia</option>
+                <option value="Australia/Perth">Perth, Australia</option>
+                <option value="Australia/Adelaide">Adelaide, Australia</option>
+                <option value="Pacific/Auckland">Auckland, New Zealand</option>
+                <option value="Pacific/Wellington">Wellington, New Zealand</option>
+                <option value="Pacific/Fiji">Fiji</option>
+                <!-- Pacific -->
+                <option value="Pacific/Honolulu">Honolulu, Hawaii</option>
+                <option value="Pacific/Guam">Guam</option>
+                <option value="Pacific/Port_Moresby">Port Moresby, Papua New Guinea</option>
             </select>
             <div class="modal-actions">
                 <button class="modal-btn cancel" id="cancelWorldClockBtn">Cancel</button>
@@ -1108,61 +1251,139 @@
         <div class="modal">
             <h3>⚙️ Settings</h3>
 
-            <div class="modal-section">
-                <div class="modal-section-title">🎨 Theme</div>
-                <div class="theme-options">
-                    <div class="theme-option" data-theme="auto">
-                        <div class="theme-option-icon">🔄</div>
-                        <div class="theme-option-label">Auto</div>
-                    </div>
-                    <div class="theme-option" data-theme="dark">
-                        <div class="theme-option-icon">🌙</div>
-                        <div class="theme-option-label">Dark</div>
-                    </div>
-                    <div class="theme-option" data-theme="light">
-                        <div class="theme-option-icon">☀️</div>
-                        <div class="theme-option-label">Light</div>
+            <!-- Tabs -->
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="theme">🎨 Theme</button>
+                <button class="settings-tab" data-tab="clock">🕐 Clock</button>
+                <button class="settings-tab" data-tab="bookmarks">🔖 Quick Links</button>
+                <button class="settings-tab" data-tab="prayer">🕌 Prayer</button>
+            </div>
+
+            <!-- Tab Content: Theme -->
+            <div class="settings-tab-content active" id="theme-tab">
+                <div class="modal-section">
+                    <div class="modal-section-title">Theme Selection</div>
+                    <div class="theme-options">
+                        <div class="theme-option" data-theme="auto">
+                            <div class="theme-option-icon">🔄</div>
+                            <div class="theme-option-label">Auto</div>
+                        </div>
+                        <div class="theme-option" data-theme="dark">
+                            <div class="theme-option-icon">🌙</div>
+                            <div class="theme-option-label">Dark</div>
+                        </div>
+                        <div class="theme-option" data-theme="light">
+                            <div class="theme-option-icon">☀️</div>
+                            <div class="theme-option-label">Light</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-section">
-                <div class="modal-section-title">🕌 Prayer Settings</div>
-
-                <label class="modal-label">Location</label>
-                <div class="location-inputs">
-                    <input type="text" class="modal-input" id="prayerLatitude" placeholder="Latitude">
-                    <input type="text" class="modal-input" id="prayerLongitude" placeholder="Longitude">
+            <!-- Tab Content: Clock -->
+            <div class="settings-tab-content" id="clock-tab">
+                <div class="modal-section">
+                    <div class="modal-section-title">Time Format</div>
+                    <div class="theme-options">
+                        <div class="theme-option" data-clock-format="12">
+                            <div class="theme-option-icon">🕐</div>
+                            <div class="theme-option-label">12 Hour</div>
+                        </div>
+                        <div class="theme-option" data-clock-format="24">
+                            <div class="theme-option-icon">🕑</div>
+                            <div class="theme-option-label">24 Hour</div>
+                        </div>
+                    </div>
                 </div>
-                <button class="auto-locate-btn" id="autoLocateBtn">📍 Auto-Detect Location</button>
 
-                <label class="modal-label">Calculation Method</label>
-                <select class="modal-select" id="calculationMethod">
-                    <option value="1">Egyptian General Authority of Survey</option>
-                    <option value="2">Islamic Society of North America (ISNA)</option>
-                    <option value="3">Muslim World League</option>
-                    <option value="4">Umm al-Qura University, Makkah</option>
-                    <option value="5">University of Islamic Sciences, Karachi</option>
-                    <option value="7">Institute of Geophysics, University of Tehran</option>
-                    <option value="8">Majority</option>
-                    <option value="9">Kuwait</option>
-                    <option value="10">Qatar</option>
-                    <option value="11">Majlis Ugama Islam Singapura</option>
-                    <option value="12">Union Organization Islamic de France</option>
-                    <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
-                    <option value="14">Spiritual Administration of Muslims of Russia</option>
-                </select>
-
-                <label class="modal-label">Asr Calculation (Madhab)</label>
-                <select class="modal-select" id="asrMethod">
-                    <option value="0">Shafi'i, Maliki, Hanbali</option>
-                    <option value="1">Hanafi</option>
-                </select>
+                <div class="modal-section">
+                    <div class="modal-section-title">Manage World Clocks</div>
+                    <div class="sidebar-toggle-options">
+                        <div class="sidebar-toggle-row">
+                            <span class="sidebar-toggle-label" id="worldClocksCountTab">0 clocks added</span>
+                            <button class="toggle-btn" id="manageWorldClocksBtnTab">Manage</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
+            <!-- Tab Content: Bookmarks -->
+            <div class="settings-tab-content" id="bookmarks-tab">
+                <div class="modal-section">
+                    <div class="modal-section-title">Manage Quick Links</div>
+                    <div class="sidebar-toggle-options">
+                        <div class="sidebar-toggle-row">
+                            <span class="sidebar-toggle-label" id="bookmarksCountTab">0 bookmarks added</span>
+                            <button class="toggle-btn" id="manageBookmarksBtnTab">Manage</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Prayer -->
+            <div class="settings-tab-content" id="prayer-tab">
+                <div class="modal-section">
+                    <div class="modal-section-title">Location</div>
+                    <div class="location-inputs">
+                        <input type="text" class="modal-input" id="prayerLatitude" placeholder="Latitude">
+                        <input type="text" class="modal-input" id="prayerLongitude" placeholder="Longitude">
+                    </div>
+                    <button class="auto-locate-btn" id="autoLocateBtn">📍 Auto-Detect Location</button>
+
+                    <div class="modal-section" style="margin-top: 20px;">
+                        <div class="modal-section-title">Calculation Method</div>
+                        <select class="modal-select" id="calculationMethod">
+                            <option value="1">Egyptian General Authority of Survey</option>
+                            <option value="2">Islamic Society of North America (ISNA)</option>
+                            <option value="3">Muslim World League</option>
+                            <option value="4">Umm al-Qura University, Makkah</option>
+                            <option value="5">University of Islamic Sciences, Karachi</option>
+                            <option value="7">Institute of Geophysics, University of Tehran</option>
+                            <option value="8">Majority</option>
+                            <option value="9">Kuwait</option>
+                            <option value="10">Qatar</option>
+                            <option value="11">Majlis Ugama Islam Singapura</option>
+                            <option value="12">Union Organization Islamic de France</option>
+                            <option value="13">Diyanet İşleri Başkanlığı, Turkey</option>
+                            <option value="14">Spiritual Administration of Muslims of Russia</option>
+                        </select>
+
+                        <div class="modal-section" style="margin-top: 15px;">
+                            <div class="modal-section-title">Asr Calculation (Madhab)</div>
+                            <select class="modal-select" id="asrMethod">
+                                <option value="0">Shafi'i, Maliki, Hanbali</option>
+                                <option value="1">Hanafi</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="modal-btn cancel" id="closeSettingsBtn">Close</button>
+                    <button class="modal-btn save" id="savePrayerSettingsBtn">Save Prayer Settings</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage World Clocks Modal -->
+    <div class="modal-overlay" id="manageWorldClocksModal">
+        <div class="modal">
+            <h3>🌍 Manage World Clocks</h3>
+            <div id="manageWorldClocksList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
             <div class="modal-actions">
-                <button class="modal-btn cancel" id="closeSettingsBtn">Close</button>
-                <button class="modal-btn save" id="savePrayerSettingsBtn">Save Prayer Settings</button>
+                <button class="modal-btn cancel" id="closeManageWorldClocksBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Bookmarks Modal -->
+    <div class="modal-overlay" id="manageBookmarksModal">
+        <div class="modal">
+            <h3>🔖 Manage Quick Links</h3>
+            <div id="manageBookmarksList" style="max-height: 300px; overflow-y: auto; margin-bottom: 15px;"></div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="closeManageBookmarksBtn">Close</button>
             </div>
         </div>
     </div>
@@ -1175,7 +1396,9 @@
         const WORLD_CLOCKS_KEY = 'worldClocks';
         const PRAYER_TIMES_KEY = 'prayerTimes';
         const THEME_KEY = 'theme';
+        const CLOCK_FORMAT_KEY = 'clockFormat';
         const SIDEBAR_KEY = 'sidebarState';
+        const QURAN_AUDIO_KEY = 'quranAudio';
 
         // DOM Elements
         let prayerTimesList, nextPrayerName, nextPrayerTimer, prayerLocation;
@@ -1287,12 +1510,31 @@
             return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
         }
 
+        function getClockFormat() {
+            const stored = localStorage.getItem(CLOCK_FORMAT_KEY);
+            return stored || '12';
+        }
+
         function updateClock() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            const format = getClockFormat();
+
+            let hours, minutes, seconds;
+            if (format === '24') {
+                hours = String(now.getHours()).padStart(2, '0');
+                minutes = String(now.getMinutes()).padStart(2, '0');
+                seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+            } else {
+                let h = now.getHours();
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12;
+                h = h ? h : 12;
+                hours = String(h).padStart(2, '0');
+                minutes = String(now.getMinutes()).padStart(2, '0');
+                seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds} ${ampm}`;
+            }
 
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('date').textContent = now.toLocaleDateString('en-US', options);
@@ -1356,16 +1598,19 @@
                 worldClocksContainer.appendChild(clockDiv);
             });
 
-            const addBtn = document.createElement('button');
-            addBtn.className = 'add-world-clock-btn';
-            addBtn.textContent = '+';
-            addBtn.addEventListener('click', openWorldClockModal);
-            worldClocksContainer.appendChild(addBtn);
+            if (clocks.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.style.cssText = 'color: var(--text-muted); font-size: 0.85rem; width: 100%; text-align: center;';
+                emptyMsg.textContent = 'Add world clocks from Settings';
+                worldClocksContainer.appendChild(emptyMsg);
+            }
         }
 
         function updateWorldClocks() {
             const clocks = loadWorldClocks();
             const now = new Date();
+            const format = getClockFormat();
+            const use12Hour = format !== '24';
 
             clocks.forEach(clock => {
                 const timeEl = document.getElementById(`wc-${clock.id}`);
@@ -1373,7 +1618,7 @@
                     const options = {
                         hour: '2-digit',
                         minute: '2-digit',
-                        hour12: true,
+                        hour12: use12Hour,
                         timeZone: clock.timezone
                     };
                     timeEl.textContent = now.toLocaleTimeString('en-US', options);
@@ -1793,11 +2038,12 @@
                 bookmarksContainer.appendChild(link);
             });
 
-            const addBtn = document.createElement('button');
-            addBtn.className = 'add-bookmark-btn';
-            addBtn.textContent = '+';
-            addBtn.addEventListener('click', openBookmarkModal);
-            bookmarksContainer.appendChild(addBtn);
+            if (bookmarks.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.style.cssText = 'color: var(--text-muted); font-size: 0.85rem; width: 100%; text-align: center;';
+                emptyMsg.textContent = 'Add quick links from Settings';
+                bookmarksContainer.appendChild(emptyMsg);
+            }
         }
 
         function openBookmarkModal() {
@@ -1889,7 +2135,7 @@
             asrMethod: 0
         };
 
-        // Hadiths collection
+        // Hadiths collection (100 Hadiths)
         const hadiths = [
             { text: "The seeking of knowledge is obligatory for every Muslim.", reference: "Sunan Ibn Majah 224" },
             { text: "He who is not grateful to the people, is not grateful to Allah.", reference: "Sunan Abi Dawud 4811" },
@@ -1905,7 +2151,88 @@
             { text: "Actions are but by intentions and every man shall have but that which he intended.", reference: "Sahih al-Bukhari 1" },
             { text: "The most beloved of deeds to Allah are those that are most consistent, even if they are small.", reference: "Sahih al-Bukhari 6464" },
             { text: "Richness is not having many possessions, but richness is being content with oneself.", reference: "Sahih al-Bukhari 6446" },
-            { text: "Whoever believes in Allah and the Last Day should speak good or remain silent.", reference: "Sahih al-Bukhari 6475" }
+            { text: "Whoever believes in Allah and the Last Day should speak good or remain silent.", reference: "Sahih al-Bukhari 6475" },
+            { text: "Honesty leads to righteousness, and righteousness leads to Paradise.", reference: "Sahih al-Bukhari 6094" },
+            { text: "The Muslim is the one from whose tongue and hand the Muslims are safe.", reference: "Sahih al-Bukhari 10" },
+            { text: "Whoever believes in Allah and the Last Day, let him honor his guest.", reference: "Sahih al-Bukhari 6475" },
+            { text: "Love for your brother what you love for yourself.", reference: "Sahih al-Bukhari 13" },
+            { text: "Do not become angry with people.", reference: "Sahih al-Bukhari 6116" },
+            { text: "The truthful and trustworthy merchant will be with the Prophets, the truthful and the martyrs.", reference: "Jami at-Tirmidhi 1209" },
+            { text: "Whoever builds a mosque for Allah, Allah will build for him a house in Paradise.", reference: "Sahih al-Bukhari 450" },
+            { text: "The example of the believers in their mutual love, mercy and compassion is like the body.", reference: "Sahih Muslim 2586" },
+            { text: "Verily, Allah is gentle and He loves gentleness in all matters.", reference: "Sahih al-Bukhari 6927" },
+            { text: "Whoever forgives and makes reconciliation, his reward is with Allah.", reference: "Surah Ash-Shura 42:40" },
+            { text: "The upper hand is better than the lower hand (giving is better than receiving).", reference: "Sahih al-Bukhari 1429" },
+            { text: "Whoever is deprived of gentleness is deprived of all good.", reference: "Sahih Muslim 2592" },
+            { text: "The believer is not one who eats his fill while his neighbor is hungry.", reference: "Al-Adab Al-Mufrad 112" },
+            { text: "Make things easy and do not make them difficult. Give glad tidings and do not repel people.", reference: "Sahih al-Bukhari 69" },
+            { text: "The best Jihad is a word of truth spoken to a tyrannical ruler.", reference: "Sunan an-Nasa'i 4206" },
+            { text: "Whoever calls to guidance will have a reward like those who follow it.", reference: "Sahih Muslim 2674" },
+            { text: "Shyness is a branch of faith.", reference: "Sahih al-Bukhari 9" },
+            { text: "The best of people are those who are most beneficial to people.", reference: "Al-Mu'jam al-Awsat 6026" },
+            { text: "Whoever treads a path in search of knowledge, Allah will make easy for him the path to Paradise.", reference: "Sahih Muslim 2699" },
+            { text: "The world is green and beautiful, and Allah has appointed you as His stewards over it.", reference: "Sahih Muslim 2742" },
+            { text: "Whoever has an atom's weight of pride in his heart will not enter Paradise.", reference: "Sahih Muslim 91" },
+            { text: "A man walking along a path felt very thirsty. He found a well, went down into it and drank. Then he came out and saw a dog panting and licking mud. The man said: This dog is as thirsty as I was. So he went back down into the well, filled his shoe with water, held it in his mouth and climbed up and gave the dog water. Allah thanked him for his deed and forgave him. The people asked: O Messenger of Allah, is there a reward for us in serving the animals? He replied: Yes, there is a reward for serving any living being.", reference: "Sahih al-Bukhari 2466" },
+            { text: "The likeness of the believers in their mutual love, mercy and compassion is like that of the body: if any part of it is ill, the whole body shares its sleeplessness and fever.", reference: "Sahih Muslim 2586" },
+            { text: "Whoever relieves a believer from some worldly distress, Allah will relieve him from some of the distress on the Day of Resurrection.", reference: "Sahih Muslim 2699" },
+            { text: "Allah does not look at your appearance or wealth, but He looks at your hearts and deeds.", reference: "Sahih Muslim 2564" },
+            { text: "The parable of the one who remembers his Lord and the one who does not is like that of the living and the dead.", reference: "Sahih al-Bukhari 6407" },
+            { text: "Whoever performs ablution properly, his sins will depart from his body, even from under his nails.", reference: "Sahih Muslim 245" },
+            { text: "The five daily prayers and from one Friday prayer to the next expiate whatever sins come in between, so long as one does not commit any major sin.", reference: "Sahih Muslim 233" },
+            { text: "Whoever prays the two cool prayers (Fajr and Asr) will enter Paradise.", reference: "Sahih al-Bukhari 574" },
+            { text: "The first matter that the slave will be brought to account for on the Day of Judgment is the prayer.", reference: "Sunan an-Nasa'i 465" },
+            { text: "Fasting is a shield with which a servant protects himself from the Fire.", reference: "Sahih al-Bukhari 1894" },
+            { text: "Whoever fasts Ramadan with faith and seeking reward, his previous sins will be forgiven.", reference: "Sahih al-Bukhari 38" },
+            { text: "Charity does not decrease wealth.", reference: "Sahih Muslim 2588" },
+            { text: "There is a reward for serving any animate (living being).", reference: "Sahih al-Bukhari 2466" },
+            { text: "Whoever among you sees an evil, let him change it with his hand; if he cannot, then with his tongue; if he cannot, then with his heart - and that is the weakest of faith.", reference: "Sahih Muslim 49" },
+            { text: "The example of guidance and knowledge with which Allah has sent me is like abundant rain falling on the earth.", reference: "Sahih al-Bukhari 79" },
+            { text: "Whoever learns knowledge that should be sought for the Face of Allah, but learns it only to get some worldly benefit, he will not smell the fragrance of Paradise on the Day of Resurrection.", reference: "Sunan Abi Dawud 3664" },
+            { text: "When a man dies, his deeds come to an end except for three: ongoing charity, knowledge that is benefited from, and a righteous child who prays for him.", reference: "Sahih Muslim 1631" },
+            { text: "The best wealth is a tongue that remembers Allah, a grateful heart, and a believing wife who helps one in one's faith.", reference: "Jami at-Tirmidhi 2327" },
+            { text: "Whoever guarantees to me what is between his jaws (his tongue) and what is between his legs (his private parts), I guarantee him Paradise.", reference: "Sahih al-Bukhari 6474" },
+            { text: "Do not envy one another, do not inflate prices for one another, do not hate one another, do not turn away from one another, and do not undercut one another in trade.", reference: "Sahih Muslim 2559" },
+            { text: "The believers in their mutual kindness, compassion and sympathy are just one body; when a limb suffers, the whole body responds to it with wakefulness and fever.", reference: "Sahih al-Bukhari 6011" },
+            { text: "Whoever among you leads the people in prayer, let him shorten it, for among them are the weak, the young and the elderly.", reference: "Sahih al-Bukhari 703" },
+            { text: "The most perfect believer in faith is the one who is best in character.", reference: "Sunan Abi Dawud 4682" },
+            { text: "Nothing is heavier on the Scale of Deeds than good character.", reference: "Sunan Abi Dawud 4799" },
+            { text: "Whoever suppresses his anger while being able to act upon it, Allah will call him before all of creation on the Day of Resurrection and let him choose from the Hur al-Ayn whoever he wishes.", reference: "Jami at-Tirmidhi 2493" },
+            { text: "The strong believer is better and more beloved to Allah than the weak believer, while there is good in both.", reference: "Sahih Muslim 2664" },
+            { text: "Strive for that which will benefit you and seek the help of Allah, and do not feel helpless.", reference: "Sahih Muslim 2664" },
+            { text: "If the Hour is about to be established and one of you has a palm shoot in his hand, let him plant it.", reference: "Musnad Ahmad 12981" },
+            { text: "Wonderful is the case of a believer; there is good for him in everything, and this applies only to a believer.", reference: "Sahih Muslim 2999" },
+            { text: "Whoever would like to be delivered from the Fire and admitted to Paradise, let him die with faith in Allah and the Last Day.", reference: "Sahih Muslim 18" },
+            { text: "The rights of the Muslim upon the Muslim are six. It was said: What are they, O Messenger of Allah? He said: When you meet him, greet him with peace; when he invites you, respond to his invitation; when he seeks your advice, advise him; when he sneezes and praises Allah, say Yarhamuk Allah; when he falls ill, visit him; and when he dies, follow his funeral.", reference: "Sahih Muslim 2162" },
+            { text: "It is enough falsehood for a man to relate everything he hears.", reference: "Sahih Muslim 5" },
+            { text: "Whoever imitates a people is one of them.", reference: "Sunan Abi Dawud 4031" },
+            { text: "The key to Paradise is prayer, and the key to prayer is purification.", reference: "Musnad Ahmad 14437" },
+            { text: "Between a man and disbelief is the abandonment of prayer.", reference: "Sahih Muslim 82" },
+            { text: "Whoever performs ablution and does it well, his sins will come out from his body, even from under his nails.", reference: "Sahih Muslim 245" },
+            { text: "The prayer in congregation is twenty-seven times more virtuous than the prayer performed individually.", reference: "Sahih al-Bukhari 645" },
+            { text: "Whoever goes to the mosque, Allah prepares for him a place in Paradise for every time he goes.", reference: "Sahih al-Bukhari 662" },
+            { text: "The best prayer for women is in the innermost part of their houses.", reference: "Sunan Abi Dawud 570" },
+            { text: "Whoever performs Wudu properly, then says: Ash-hadu an la ilaha illallah wahdahu la sharika lah, wa ash-hadu anna Muhammadan abduhu wa rasuluh, the eight gates of Paradise will be opened for him.", reference: "Sahih Muslim 234" },
+            { text: "Shall I not tell you of something by which Allah blots out sins and raises ranks in status? They said: Yes, O Messenger of Allah. He said: Performing ablution properly despite difficulties, walking many steps to the mosques, and waiting for prayer after prayer.", reference: "Sahih Muslim 251" },
+            { text: "Whoever prays twelve rak'ahs in a day and night, a house will be built for him in Paradise.", reference: "Sahih Muslim 728" },
+            { text: "The closest a servant comes to his Lord is when he is prostrating.", reference: "Sahih Muslim 482" },
+            { text: "O Allah, help me to remember You, to thank You, and to worship You in the best manner.", reference: "Sunan Abi Dawud 1522" },
+            { text: "There is no Muslim who recites these words (Ayat al-Kursi) when he reaches the evening except that Allah will send a guardian to protect him until morning.", reference: "Al-Tabarani" },
+            { text: "Whoever says SubhanAllah wa bihamdihi one hundred times in a day, his sins will be forgiven even if they were like the foam of the sea.", reference: "Sahih al-Bukhari 6405" },
+            { text: "Two words are light on the tongue, heavy on the Scale, and beloved to the Most Merciful: SubhanAllahi wa bihamdihi, SubhanAllahil-Azim.", reference: "Sahih al-Bukhari 7563" },
+            { text: "The best dhikr is La ilaha illallah.", reference: "Jami at-Tirmidhi 3383" },
+            { text: "Whoever says La ilaha illallah wahdahu la sharika lah, lahul-mulku wa lahul-hamdu wa huwa ala kulli shayin qadir, ten times in a day will be like freeing four slaves from the children of Ismail.", reference: "Sahih al-Bukhari 3294" },
+            { text: "Shall I not inform you of the best of your deeds, the purest in the sight of your Lord, and the highest in your degrees? They said: Yes, O Messenger of Allah. He said: The remembrance of Allah.", reference: "Jami at-Tirmidhi 3377" },
+            { text: "When you pass by the gardens of Paradise, graze therein. They said: What are the gardens of Paradise? He said: The circles of dhikr.", reference: "Jami at-Tirmidhi 3510" },
+            { text: "Whoever seeks forgiveness for believing men and believing women, Allah will write for him a good deed for each believing man and believing woman.", reference: "Al-Tabarani" },
+            { text: "O people, repent to Allah for I repent to Him one hundred times a day.", reference: "Sahih Muslim 2702" },
+            { text: "All the sons of Adam are sinners, but the best of sinners are those who repent.", reference: "Jami at-Tirmidhi 2499" },
+            { text: "Whoever repents before the sun rises from the west, Allah will turn to him in forgiveness.", reference: "Sahih Muslim 2703" },
+            { text: "Allah is more pleased with the repentance of His servant than one of you finding his camel in the desert after losing it.", reference: "Sahih al-Bukhari 6309" },
+            { text: "The one who repents from sin is like one who has no sin.", reference: "Sunan Ibn Majah 4250" },
+            { text: "Beware of suspicion, for suspicion is the worst of false tales.", reference: "Sahih al-Bukhari 6064" },
+            { text: "Do not backbite the Muslims, for whoever backbites a Muslim, Allah will cause him to dwell in the Fire of Hell.", reference: "Sunan Abi Dawud 4877" },
+            { text: "Whoever believes in Allah and the Last Day, let him not harm his neighbor.", reference: "Sahih al-Bukhari 6019" }
         ];
 
         function getHadithForPeriod() {
@@ -1955,6 +2282,41 @@
                 surahSelect.appendChild(option);
             });
 
+            // Load saved state
+            function loadQuranState() {
+                const saved = localStorage.getItem(QURAN_AUDIO_KEY);
+                if (saved) {
+                    try {
+                        const state = JSON.parse(saved);
+                        if (state.surah && state.currentTime !== undefined) {
+                            surahSelect.value = state.surah;
+                            quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${state.surah}.mp3`;
+                            quranAudio.style.display = 'block';
+
+                            // Restore position once metadata is loaded
+                            quranAudio.addEventListener('loadedmetadata', () => {
+                                quranAudio.currentTime = state.currentTime;
+                                if (state.wasPlaying) {
+                                    quranAudio.play().catch(e => console.log('Auto-play prevented:', e));
+                                }
+                            }, { once: true });
+                        }
+                    } catch (e) {
+                        console.error('Error loading Quran state:', e);
+                    }
+                }
+            }
+
+            // Save state
+            function saveQuranState() {
+                const state = {
+                    surah: surahSelect.value,
+                    currentTime: quranAudio.currentTime,
+                    wasPlaying: !quranAudio.paused
+                };
+                localStorage.setItem(QURAN_AUDIO_KEY, JSON.stringify(state));
+            }
+
             // Handle Surah selection
             surahSelect.addEventListener('change', () => {
                 const surahNum = surahSelect.value;
@@ -1977,10 +2339,17 @@
             // Handle play/pause
             quranAudio.addEventListener('play', () => {
                 playingIndicator.classList.add('active');
+                saveQuranState();
             });
 
             quranAudio.addEventListener('pause', () => {
                 playingIndicator.classList.remove('active');
+                saveQuranState();
+            });
+
+            // Save position periodically during playback
+            quranAudio.addEventListener('timeupdate', () => {
+                saveQuranState();
             });
 
             // Handle end - loop or play next
@@ -2010,6 +2379,9 @@
                     }
                 }
             });
+
+            // Load saved state on init
+            loadQuranState();
         }
 
         function loadPrayerSettings() {
@@ -2150,6 +2522,7 @@
             if (!prayerTimesData) {
                 nextPrayerName.textContent = '--';
                 nextPrayerTimer.textContent = '--:--:--';
+                document.title = 'Islamic Clock';
                 return;
             }
 
@@ -2169,7 +2542,12 @@
                     const hours = Math.floor(diff / (1000 * 60 * 60));
                     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                    nextPrayerTimer.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    const countdownText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    nextPrayerTimer.textContent = countdownText;
+
+                    // Update browser title with next prayer name and time
+                    const prayerTimeStr = targetTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                    document.title = `${nextPrayer.name} at ${prayerTimeStr} | Islamic Clock`;
                 } else {
                     fetchPrayerTimes();
                 }
@@ -2241,10 +2619,208 @@
         // Theme options
         document.querySelectorAll('.theme-option').forEach(option => {
             option.addEventListener('click', () => {
-                const theme = option.dataset.theme;
-                localStorage.setItem(THEME_KEY, theme);
-                applyTheme(theme);
-                updateThemeOptions();
+                // Handle theme selection
+                if (option.dataset.theme) {
+                    const theme = option.dataset.theme;
+                    localStorage.setItem(THEME_KEY, theme);
+                    applyTheme(theme);
+                    updateThemeOptions();
+                }
+                // Handle clock format selection
+                if (option.dataset.clockFormat) {
+                    const format = option.dataset.clockFormat;
+                    localStorage.setItem(CLOCK_FORMAT_KEY, format);
+                    updateClockFormatOptions();
+                    updateClock();
+                }
+            });
+        });
+
+        function updateClockFormatOptions() {
+            const currentFormat = getClockFormat();
+            document.querySelectorAll('.theme-option').forEach(option => {
+                if (option.dataset.clockFormat) {
+                    option.classList.remove('active');
+                    if (option.dataset.clockFormat === currentFormat) {
+                        option.classList.add('active');
+                    }
+                }
+            });
+        }
+
+        // Manage World Clocks
+        const manageWorldClocksModal = document.getElementById('manageWorldClocksModal');
+        const manageWorldClocksList = document.getElementById('manageWorldClocksList');
+        const manageWorldClocksBtn = document.getElementById('manageWorldClocksBtnTab');
+        const closeManageWorldClocksBtn = document.getElementById('closeManageWorldClocksBtn');
+
+        function updateWorldClocksCount() {
+            const clocks = loadWorldClocks();
+            const countEl = document.getElementById('worldClocksCount');
+            const countTabEl = document.getElementById('worldClocksCountTab');
+            const countText = `${clocks.length} clock${clocks.length !== 1 ? 's' : ''} added`;
+            if (countEl) {
+                countEl.textContent = countText;
+            }
+            if (countTabEl) {
+                countTabEl.textContent = countText;
+            }
+        }
+
+        function renderManageWorldClocks() {
+            const clocks = loadWorldClocks();
+            manageWorldClocksList.innerHTML = '';
+
+            // Add button at top
+            const addBtn = document.createElement('button');
+            addBtn.className = 'modal-btn save';
+            addBtn.style.cssText = 'width: 100%; margin-bottom: 15px;';
+            addBtn.textContent = '+ Add World Clock';
+            addBtn.addEventListener('click', () => {
+                closeManageWorldClocks();
+                openWorldClockModal();
+            });
+            manageWorldClocksList.appendChild(addBtn);
+
+            if (clocks.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.style.cssText = 'color: var(--text-muted); text-align: center; margin: 20px 0;';
+                emptyMsg.textContent = 'No world clocks added yet.';
+                manageWorldClocksList.appendChild(emptyMsg);
+                return;
+            }
+
+            clocks.forEach(clock => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 8px;';
+                div.innerHTML = `
+                    <div>
+                        <div style="color: var(--text-primary); font-weight: bold;">${clock.label}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">${clock.timezone}</div>
+                    </div>
+                    <button class="todo-action-btn delete" data-id="${clock.id}">Remove</button>
+                `;
+                div.querySelector('button').addEventListener('click', () => {
+                    removeWorldClock(clock.id);
+                    renderManageWorldClocks();
+                    updateWorldClocksCount();
+                    renderWorldClocks();
+                });
+                manageWorldClocksList.appendChild(div);
+            });
+        }
+
+        function openManageWorldClocks() {
+            renderManageWorldClocks();
+            manageWorldClocksModal.classList.add('active');
+        }
+
+        function closeManageWorldClocks() {
+            manageWorldClocksModal.classList.remove('active');
+        }
+
+        manageWorldClocksBtn.addEventListener('click', openManageWorldClocks);
+        closeManageWorldClocksBtn.addEventListener('click', closeManageWorldClocks);
+        manageWorldClocksModal.addEventListener('click', (e) => {
+            if (e.target === manageWorldClocksModal) {
+                closeManageWorldClocks();
+            }
+        });
+
+        // Manage Bookmarks
+        const manageBookmarksModal = document.getElementById('manageBookmarksModal');
+        const manageBookmarksList = document.getElementById('manageBookmarksList');
+        const manageBookmarksBtn = document.getElementById('manageBookmarksBtnTab');
+        const closeManageBookmarksBtn = document.getElementById('closeManageBookmarksBtn');
+
+        function updateBookmarksCount() {
+            const bookmarks = loadBookmarks();
+            const countEl = document.getElementById('bookmarksCount');
+            const countTabEl = document.getElementById('bookmarksCountTab');
+            const countText = `${bookmarks.length} bookmark${bookmarks.length !== 1 ? 's' : ''} added`;
+            if (countEl) {
+                countEl.textContent = countText;
+            }
+            if (countTabEl) {
+                countTabEl.textContent = countText;
+            }
+        }
+
+        function renderManageBookmarks() {
+            const bookmarks = loadBookmarks();
+            manageBookmarksList.innerHTML = '';
+
+            // Add button at top
+            const addBtn = document.createElement('button');
+            addBtn.className = 'modal-btn save';
+            addBtn.style.cssText = 'width: 100%; margin-bottom: 15px;';
+            addBtn.textContent = '+ Add Quick Link';
+            addBtn.addEventListener('click', () => {
+                closeManageBookmarks();
+                bookmarkModal.classList.add('active');
+            });
+            manageBookmarksList.appendChild(addBtn);
+
+            if (bookmarks.length === 0) {
+                const emptyMsg = document.createElement('p');
+                emptyMsg.style.cssText = 'color: var(--text-muted); text-align: center; margin: 20px 0;';
+                emptyMsg.textContent = 'No quick links added yet.';
+                manageBookmarksList.appendChild(emptyMsg);
+                return;
+            }
+
+            bookmarks.forEach(bookmark => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; background: var(--bg-tertiary); border-radius: 4px; margin-bottom: 8px;';
+                div.innerHTML = `
+                    <div>
+                        <div style="color: var(--text-primary); font-weight: bold;">${bookmark.name}</div>
+                        <div style="color: var(--text-muted); font-size: 0.75rem;">${bookmark.url}</div>
+                    </div>
+                    <button class="todo-action-btn delete" data-id="${bookmark.id}">Remove</button>
+                `;
+                div.querySelector('button').addEventListener('click', () => {
+                    deleteBookmark(bookmark.id);
+                    renderManageBookmarks();
+                    updateBookmarksCount();
+                    renderBookmarks();
+                });
+                manageBookmarksList.appendChild(div);
+            });
+        }
+
+        function openManageBookmarks() {
+            renderManageBookmarks();
+            manageBookmarksModal.classList.add('active');
+        }
+
+        function closeManageBookmarks() {
+            manageBookmarksModal.classList.remove('active');
+        }
+
+        manageBookmarksBtn.addEventListener('click', openManageBookmarks);
+        closeManageBookmarksBtn.addEventListener('click', closeManageBookmarks);
+        manageBookmarksModal.addEventListener('click', (e) => {
+            if (e.target === manageBookmarksModal) {
+                closeManageBookmarks();
+            }
+        });
+
+        // Settings Tabs functionality
+        const settingsTabs = document.querySelectorAll('.settings-tab');
+        const tabContents = document.querySelectorAll('.settings-tab-content');
+
+        settingsTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+
+                // Remove active class from all tabs and contents
+                settingsTabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Add active class to selected tab and content
+                tab.classList.add('active');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
             });
         });
 
@@ -2276,9 +2852,13 @@
         });
 
         // Initial renders
+        updateSidebarUI();
         renderTodos();
         renderBookmarks();
         renderWorldClocks();
+        updateWorldClocksCount();
+        updateBookmarksCount();
+        updateClockFormatOptions();
         fetchPrayerTimes();
         displayHadith();
         initQuranPlayer();

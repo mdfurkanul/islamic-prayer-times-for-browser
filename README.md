@@ -5,6 +5,12 @@ A beautiful, feature-rich dashboard clock designed specifically for Muslims. Thi
 ![Theme](https://img.shields.io/badge/theme-dark%2Flight-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+## Live Demo
+
+🕌 **[Try it now](https://mdfurkanul.github.io/islamic-prayer-times-for-browser/)**
+
+---
+
 ## Features
 
 ### Core Features
