@@ -69,6 +69,15 @@
             border-left: 1px solid var(--border-color);
         }
 
+        .sidebar.right-sidebar .sidebar-header {
+            flex-shrink: 0;
+        }
+
+        .sidebar.right-sidebar .prayer-scroll-container {
+            flex: 1;
+            min-height: 0;
+        }
+
         .sidebar.hidden {
             width: 0;
             padding: 0;
@@ -588,6 +597,28 @@
             height: 100%;
         }
 
+        .prayer-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+            min-height: 0;
+        }
+
+        .prayer-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .prayer-scroll-container::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 3px;
+        }
+
+        .prayer-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
+        }
+
         .prayer-countdown {
             background-color: var(--bg-secondary);
             border-radius: 8px;
@@ -622,6 +653,22 @@
             flex-direction: column;
             gap: 6px;
             margin-bottom: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .prayer-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .prayer-list::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 3px;
+        }
+
+        .prayer-list::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 3px;
         }
 
         .prayer-item {
@@ -662,6 +709,7 @@
             margin-bottom: 15px;
             border: 1px solid var(--border-color);
             text-align: center;
+            flex-shrink: 0;
         }
 
         .hadith-text {
@@ -686,6 +734,7 @@
             padding: 15px;
             margin-bottom: 15px;
             border: 1px solid var(--border-color);
+            flex-shrink: 0;
         }
 
         .quran-player-title {
@@ -1881,39 +1930,41 @@
             <h2>Prayer Times</h2>
         </div>
 
-        <div class="prayer-countdown">
-            <div class="prayer-countdown-label">Next Prayer</div>
-            <div class="prayer-countdown-name" id="nextPrayerName">--</div>
-            <div class="prayer-countdown-timer" id="nextPrayerTimer">--:--:--</div>
-        </div>
-
-        <div class="prayer-list" id="prayerTimesList"></div>
-
-        <div class="quran-player">
-            <div class="quran-player-title">📖 Quran Audio</div>
-            <div class="quran-options">
-                <label class="quran-option">
-                    <input type="radio" name="quranMode" id="quranLoop" value="loop">
-                    <span>Loop</span>
-                </label>
-                <label class="quran-option">
-                    <input type="radio" name="quranMode" id="quranAutoNext" value="autoNext" checked>
-                    <span>Auto Next</span>
-                </label>
+        <div class="prayer-scroll-container">
+            <div class="prayer-countdown">
+                <div class="prayer-countdown-label">Next Prayer</div>
+                <div class="prayer-countdown-name" id="nextPrayerName">--</div>
+                <div class="prayer-countdown-timer" id="nextPrayerTimer">--:--:--</div>
             </div>
-            <select class="quran-select" id="surahSelect">
-                <option value="">Select Surah...</option>
-            </select>
-            <audio class="quran-audio" id="quranAudio" controls style="display:none;"></audio>
-            <div class="playing-indicator" id="playingIndicator">▶️ Playing...</div>
-        </div>
 
-        <div class="hadith-section">
-            <p class="hadith-text" id="hadithText">Loading hadith...</p>
-            <p class="hadith-reference" id="hadithReference"></p>
-        </div>
+            <div class="prayer-list" id="prayerTimesList"></div>
 
-        <div class="prayer-location" id="prayerLocation">Detecting location...</div>
+            <div class="quran-player">
+                <div class="quran-player-title">📖 Quran Audio</div>
+                <div class="quran-options">
+                    <label class="quran-option">
+                        <input type="radio" name="quranMode" id="quranLoop" value="loop">
+                        <span>Loop</span>
+                    </label>
+                    <label class="quran-option">
+                        <input type="radio" name="quranMode" id="quranAutoNext" value="autoNext" checked>
+                        <span>Auto Next</span>
+                    </label>
+                </div>
+                <select class="quran-select" id="surahSelect">
+                    <option value="">Select Surah...</option>
+                </select>
+                <audio class="quran-audio" id="quranAudio" controls style="display:none;"></audio>
+                <div class="playing-indicator" id="playingIndicator">▶️ Playing...</div>
+            </div>
+
+            <div class="hadith-section">
+                <p class="hadith-text" id="hadithText">Loading hadith...</p>
+                <p class="hadith-reference" id="hadithReference"></p>
+            </div>
+
+            <div class="prayer-location" id="prayerLocation">Detecting location...</div>
+        </div>
     </aside>
 
     <!-- Task Modal -->
