@@ -61,6 +61,7 @@
             border-right: 1px solid var(--border-color);
             overflow: hidden;
             transition: transform 0.3s, width 0.3s, padding 0.3s, opacity 0.3s;
+            flex-shrink: 0;
         }
 
         .sidebar.right-sidebar {
@@ -259,6 +260,35 @@
             position: relative;
         }
 
+        .main-content .container {
+            width: 100%;
+            max-width: calc(100vw - 840px);
+        }
+
+        @media (min-width: 1200px) and (max-width: 1439px) {
+            .main-content .container {
+                max-width: calc(100vw - 800px);
+            }
+        }
+
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .main-content .container {
+                max-width: calc(100vw - 640px);
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 991px) {
+            .main-content .container {
+                max-width: calc(100vw - 560px);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .main-content .container {
+                max-width: 100%;
+            }
+        }
+
         .sidebar-toggle-container {
             z-index: 50;
         }
@@ -272,6 +302,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            max-width: 100%;
+            overflow-wrap: break-word;
         }
 
         .clock {
@@ -292,6 +324,58 @@
             font-size: 0.9rem;
             color: var(--text-muted);
             margin-top: 5px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        .search-container.hidden {
+            display: none;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--text-secondary);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-btn {
+            padding: 12px 20px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .search-btn:hover {
+            background-color: var(--accent-hover);
         }
 
         .main-settings-btn {
@@ -708,7 +792,7 @@
             padding: 25px;
             border-radius: 8px;
             width: 95%;
-            max-width: 580px;
+            max-width: 680px;
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -863,6 +947,26 @@
             font-size: 0.8rem;
         }
 
+        .visibility-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-tertiary);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .visibility-option:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .visibility-option.active {
+            border-color: var(--accent-color);
+            background-color: var(--bg-secondary);
+        }
+
         .sidebar-toggle-options {
             display: flex;
             flex-direction: column;
@@ -972,22 +1076,83 @@
             display: block;
         }
 
-        @media (max-width: 768px) {
+        /* Responsive Design - All Screen Sizes */
+
+        /* Large Desktop (1440px and above) */
+        @media (min-width: 1440px) {
             .sidebar {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                max-height: 40vh;
+                width: 420px;
             }
 
-            .sidebar.right-sidebar {
-                border-left: none;
-                border-top: 1px solid var(--border-color);
-                max-height: 50vh;
+            .clock {
+                font-size: 8rem;
             }
 
-            body {
-                flex-direction: column;
+            .world-clock {
+                min-width: 150px;
+                padding: 15px 25px;
+            }
+
+            .world-clock-time {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Desktop (1200px to 1439px) */
+        @media (min-width: 1200px) and (max-width: 1439px) {
+            .sidebar {
+                width: 400px;
+            }
+
+            .clock {
+                font-size: 7rem;
+            }
+        }
+
+        /* Laptop (992px to 1199px) */
+        @media (min-width: 992px) and (max-width: 1199px) {
+            .sidebar {
+                width: 320px;
+            }
+
+            .main-content {
+                padding: 20px 40px;
+            }
+
+            .clock {
+                font-size: 5rem;
+            }
+
+            .date {
+                font-size: 1.2rem;
+            }
+
+            .world-clock {
+                min-width: 120px;
+                padding: 10px 15px;
+            }
+
+            .world-clock-time {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Tablet Landscape (768px to 991px) */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .main-content {
+                padding: 20px 30px;
+            }
+
+            .modal {
+                max-width: 90%;
+            }
+
+            .search-container {
+                max-width: 90%;
             }
 
             .clock {
@@ -995,21 +1160,673 @@
             }
 
             .date {
-                font-size: 1.2rem;
+                font-size: 1.1rem;
             }
 
-            .bookmarks-container {
-                gap: 10px;
-            }
-
-            .bookmark-icon {
-                width: 42px;
-                height: 42px;
+            .week-number {
+                font-size: 0.85rem;
             }
 
             .world-clocks-section {
+                gap: 10px;
+            }
+
+            .world-clock {
+                min-width: 110px;
+                padding: 10px 12px;
+            }
+
+            .world-clock-time {
+                font-size: 1rem;
+            }
+
+            .bookmarks-label {
+                font-size: 0.8rem;
+            }
+
+            .bookmark-icon {
+                width: 44px;
+                height: 44px;
+                font-size: 1.2rem;
+            }
+
+            .quran-player {
+                padding: 12px;
+            }
+
+            .modal {
+                max-width: 500px;
+            }
+        }
+
+        /* Tablet Portrait and Mobile Landscape (481px to 767px) */
+        @media (max-width: 767px) {
+            body {
                 flex-direction: column;
-                align-items: center;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                height: auto;
+                max-height: none;
+                position: relative;
+                flex-shrink: 0;
+                overflow-y: auto;
+            }
+
+            .sidebar.right-sidebar {
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                border-bottom: none;
+                order: 2;
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .sidebar.hidden {
+                display: none;
+            }
+
+            .main-content {
+                padding: 60px 15px 15px 15px;
+                min-height: 50vh;
+                order: 1;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .search-input {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .search-btn {
+                padding: 10px 16px;
+            }
+
+            .sidebar-toggle-container {
+                position: fixed !important;
+                z-index: 100;
+                top: 10px !important;
+            }
+
+            .sidebar-toggle-container#leftSidebar {
+                left: 10px !important;
+            }
+
+            .sidebar-toggle-container#rightSidebar {
+                right: 10px !important;
+            }
+
+            .todo-scroll-container {
+                max-height: 30vh;
+                overflow-y: auto;
+            }
+
+            .prayer-list {
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .quran-player {
+                margin-bottom: 15px;
+            }
+
+            .hadith-section {
+                margin-bottom: 15px;
+            }
+
+            .clock {
+                font-size: 3.5rem;
+            }
+
+            .date {
+                font-size: 1rem;
+            }
+
+            .week-number {
+                font-size: 0.8rem;
+            }
+
+            .main-settings-btn {
+                margin-top: 15px;
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .world-clocks-section {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+                margin-top: 20px;
+            }
+
+            .world-clock {
+                min-width: 100px;
+                padding: 8px 12px;
+            }
+
+            .world-clock-time {
+                font-size: 1rem;
+            }
+
+            .world-clock-label {
+                font-size: 0.65rem;
+            }
+
+            .add-world-clock-btn {
+                min-width: 100px;
+                padding: 8px 12px;
+                font-size: 1rem;
+            }
+
+            .bookmarks-section {
+                margin-top: 20px;
+            }
+
+            .bookmarks-container {
+                gap: 8px;
+            }
+
+            .bookmark-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .bookmark-label {
+                font-size: 0.65rem;
+                max-width: 50px;
+            }
+
+            .add-bookmark-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            .prayer-countdown {
+                padding: 12px;
+                margin-bottom: 12px;
+            }
+
+            .prayer-countdown-timer {
+                font-size: 1.3rem;
+            }
+
+            .prayer-item {
+                padding: 8px 12px;
+            }
+
+            .prayer-name {
+                font-size: 0.8rem;
+            }
+
+            .prayer-time {
+                font-size: 0.85rem;
+            }
+
+            .quran-player {
+                padding: 12px;
+            }
+
+            .quran-player-title {
+                font-size: 0.8rem;
+            }
+
+            .quran-select {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+
+            .hadith-section {
+                padding: 12px;
+            }
+
+            .hadith-text {
+                font-size: 0.75rem;
+            }
+
+            .todo-item {
+                padding: 10px;
+            }
+
+            .todo-text {
+                font-size: 0.8rem;
+            }
+
+            .todo-datetime {
+                font-size: 0.65rem;
+            }
+
+            .add-task-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .modal {
+                width: 90%;
+                max-width: 90%;
+                padding: 20px;
+                max-height: 85vh;
+            }
+
+            .modal h3 {
+                font-size: 1.1rem;
+            }
+
+            .modal-input, .modal-select {
+                font-size: 0.85rem;
+                padding: 8px;
+            }
+
+            .modal-input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal-btn {
+                padding: 8px 16px;
+                font-size: 0.85rem;
+            }
+
+            .settings-tab {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+
+            .icon-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Mobile Portrait (320px to 480px) */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 10px;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .search-input {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .search-btn {
+                padding: 8px 14px;
+            }
+
+            .sidebar {
+                padding: 12px;
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .sidebar.right-sidebar {
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .todo-scroll-container {
+                max-height: 25vh;
+                overflow-y: auto;
+            }
+
+            .prayer-list {
+                max-height: none;
+                overflow-y: visible;
+            }
+
+            .clock {
+                font-size: 2.8rem;
+            }
+
+            .date {
+                font-size: 0.9rem;
+            }
+
+            .week-number {
+                font-size: 0.75rem;
+            }
+
+            .main-settings-btn {
+                width: 100%;
+                justify-content: center;
+                padding: 10px 20px;
+            }
+
+            .world-clocks-section {
+                gap: 6px;
+            }
+
+            .world-clock {
+                min-width: 80px;
+                padding: 6px 10px;
+                border-radius: 6px;
+            }
+
+            .world-clock-time {
+                font-size: 0.9rem;
+            }
+
+            .world-clock-label {
+                font-size: 0.6rem;
+                white-space: nowrap;
+            }
+
+            .add-world-clock-btn {
+                min-width: 80px;
+                padding: 6px 10px;
+                font-size: 0.9rem;
+            }
+
+            .bookmarks-container {
+                gap: 6px;
+            }
+
+            .bookmark-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1rem;
+            }
+
+            .bookmark-label {
+                font-size: 0.6rem;
+                max-width: 45px;
+            }
+
+            .add-bookmark-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 0.9rem;
+            }
+
+            .sidebar {
+                padding: 15px;
+            }
+
+            .sidebar h2 {
+                font-size: 1.1rem;
+            }
+
+            .prayer-countdown {
+                padding: 10px;
+            }
+
+            .prayer-countdown-name {
+                font-size: 1rem;
+            }
+
+            .prayer-countdown-timer {
+                font-size: 1.2rem;
+            }
+
+            .prayer-item {
+                padding: 8px 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .prayer-name {
+                font-size: 0.75rem;
+            }
+
+            .prayer-time {
+                font-size: 0.8rem;
+            }
+
+            .quran-player-title {
+                font-size: 0.75rem;
+            }
+
+            .quran-option span {
+                font-size: 0.7rem;
+            }
+
+            .quran-select {
+                font-size: 0.75rem;
+                padding: 6px;
+            }
+
+            .hadith-section {
+                padding: 10px;
+            }
+
+            .hadith-text {
+                font-size: 0.7rem;
+            }
+
+            .hadith-reference {
+                font-size: 0.65rem;
+            }
+
+            .todo-item {
+                padding: 8px;
+            }
+
+            .todo-text {
+                font-size: 0.75rem;
+            }
+
+            .todo-datetime {
+                font-size: 0.6rem;
+            }
+
+            .todo-action-btn {
+                padding: 3px 6px;
+                font-size: 0.65rem;
+            }
+
+            .add-task-btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+
+            .date-group-header {
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+
+            .modal {
+                width: 90%;
+                max-width: 90%;
+                padding: 15px;
+            }
+
+            .modal h3 {
+                font-size: 1rem;
+                margin-bottom: 15px;
+            }
+
+            .modal-section-title {
+                font-size: 0.9rem;
+            }
+
+            .modal-label {
+                font-size: 0.75rem;
+            }
+
+            .modal-input, .modal-select {
+                font-size: 0.8rem;
+                padding: 8px;
+            }
+
+            .modal-btn {
+                padding: 8px 14px;
+                font-size: 0.8rem;
+                flex: 1;
+            }
+
+            .modal-actions {
+                gap: 8px;
+            }
+
+            .theme-option {
+                padding: 10px;
+            }
+
+            .theme-option-icon {
+                font-size: 1.2rem;
+            }
+
+            .theme-option-label {
+                font-size: 0.75rem;
+            }
+
+            .settings-tab {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .sidebar-toggle-label {
+                font-size: 0.8rem;
+            }
+
+            .toggle-btn {
+                padding: 5px 10px;
+                font-size: 0.75rem;
+            }
+
+            .icon-btn {
+                width: 26px;
+                height: 26px;
+                font-size: 0.85rem;
+            }
+
+            .header-actions {
+                gap: 6px;
+            }
+
+            .prayer-location {
+                font-size: 0.65rem;
+            }
+
+            .delete-bookmark-btn {
+                width: 16px;
+                height: 16px;
+                font-size: 0.55rem;
+            }
+
+            .world-clock-remove {
+                width: 18px;
+                height: 18px;
+                font-size: 0.65rem;
+            }
+        }
+
+        /* Extra Small Mobile (280px to 320px) */
+        @media (max-width: 320px) {
+            .clock {
+                font-size: 2.2rem;
+            }
+
+            .date {
+                font-size: 0.8rem;
+            }
+
+            .sidebar {
+                padding: 10px;
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .sidebar.right-sidebar {
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .world-clock {
+                min-width: 70px;
+                padding: 5px 8px;
+            }
+
+            .world-clock-time {
+                font-size: 0.8rem;
+            }
+
+            .bookmark-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .add-bookmark-btn {
+                width: 32px;
+                height: 32px;
+            }
+
+            .modal {
+                width: 90%;
+                max-width: 90%;
+            }
+
+            .search-container {
+                max-width: 100%;
+            }
+
+            .search-input {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+
+            .search-btn {
+                padding: 6px 12px;
+            }
+        }
+
+        /* Touch-friendly spacing for mobile devices */
+        @media (hover: none) and (max-width: 767px) {
+            .icon-btn,
+            .add-task-btn,
+            .todo-action-btn,
+            .modal-btn,
+            .settings-tab,
+            .toggle-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .bookmark-item {
+                padding: 5px;
+            }
+        }
+
+        /* Hide sidebar toggle buttons when sidebar is hidden on mobile */
+        @media (max-width: 767px) {
+            .sidebar.hidden ~ .sidebar-toggle-container {
+                display: flex;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .sidebar,
+            .sidebar-toggle-container,
+            .main-settings-btn,
+            .world-clocks-section,
+            .bookmarks-section,
+            .quran-player,
+            .modal-overlay {
+                display: none !important;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .clock {
+                font-size: 4rem;
             }
         }
     </style>
@@ -1035,6 +1852,13 @@
         </div>
 
         <div class="container">
+            <div class="search-container" id="searchContainer">
+                <form class="search-form" id="searchForm">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search...">
+                    <button type="submit" class="search-btn" id="searchBtn">🔍</button>
+                </form>
+            </div>
+
             <div class="clock" id="clock">00:00:00</div>
             <div class="date" id="date"></div>
             <div class="week-number" id="weekNumber"></div>
@@ -1257,6 +2081,7 @@
                 <button class="settings-tab" data-tab="clock">🕐 Clock</button>
                 <button class="settings-tab" data-tab="bookmarks">🔖 Quick Links</button>
                 <button class="settings-tab" data-tab="prayer">🕌 Prayer</button>
+                <button class="settings-tab" data-tab="todo">🔍 Others</button>
             </div>
 
             <!-- Tab Content: Theme -->
@@ -1363,6 +2188,56 @@
                     <button class="modal-btn save" id="savePrayerSettingsBtn">Save Prayer Settings</button>
                 </div>
             </div>
+
+            <!-- Tab Content: Todo -->
+            <div class="settings-tab-content" id="todo-tab">
+                <div class="modal-section">
+                    <div class="modal-section-title">🔍 Search Settings</div>
+
+                    <label class="modal-label">Search Engine</label>
+                    <select class="modal-select" id="searchEngineSelect">
+                        <option value="google">Google</option>
+                        <option value="bing">Bing</option>
+                        <option value="yahoo">Yahoo</option>
+                        <option value="duckduckgo">DuckDuckGo</option>
+                        <option value="ecosia">Ecosia</option>
+                    </select>
+
+                    <div class="theme-options" style="margin-top: 15px;">
+                        <div class="visibility-option" id="searchBoxVisibleYes" data-value="true" style="cursor: pointer;">
+                            <div class="theme-option-icon">👁️</div>
+                            <div class="theme-option-label">Show Search Box</div>
+                        </div>
+                        <div class="visibility-option" id="searchBoxVisibleNo" data-value="false" style="cursor: pointer;">
+                            <div class="theme-option-icon">🙈</div>
+                            <div class="theme-option-label">Hide Search Box</div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 10px;">
+                        Select your preferred search engine and choose whether to display the search box.
+                    </p>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn save" id="saveSearchSettingsBtn">Save Search Settings</button>
+                </div>
+
+                <div class="modal-section" style="border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <div class="modal-section-title">📝 Auto-Archive Completed Tasks</div>
+                    <label class="modal-label">Archive tasks after being completed for:</label>
+                    <div class="sidebar-toggle-options" style="margin-top: 10px;">
+                        <div class="sidebar-toggle-row">
+                            <input type="number" class="modal-input" id="archiveDaysInput" min="0" max="365" value="7" style="width: 80px; margin-bottom: 0;">
+                            <span class="sidebar-toggle-label" style="padding-left: 10px;">days (0 = disable auto-archive)</span>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 0.75rem; margin-top: 10px;">
+                        Completed tasks older than this number of days will be automatically archived.
+                    </p>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-btn save" id="saveTodoSettingsBtn">Save Todo Settings</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1399,11 +2274,15 @@
         const CLOCK_FORMAT_KEY = 'clockFormat';
         const SIDEBAR_KEY = 'sidebarState';
         const QURAN_AUDIO_KEY = 'quranAudio';
+        const TODO_SETTINGS_KEY = 'todoSettings';
+        const SEARCH_SETTINGS_KEY = 'searchSettings';
 
         // DOM Elements
         let prayerTimesList, nextPrayerName, nextPrayerTimer, prayerLocation;
         let settingsModal, openSettingsBtn, closeSettingsBtn, savePrayerSettingsBtn;
         let prayerLatitude, prayerLongitude, autoLocateBtn, calculationMethod, asrMethod;
+        let archiveDaysInput, saveTodoSettingsBtn;
+        let searchContainer, searchForm, searchInput, searchEngineSelect, saveSearchSettingsBtn;
         let leftSidebar, rightSidebar;
         let prayerTimesData = null;
         let editingBookmarkId = null;
@@ -1659,6 +2538,7 @@
 
             saveWorldClocks(clocks);
             renderWorldClocks();
+            updateWorldClocksCount();
             closeWorldClockModal();
         }
 
@@ -1667,6 +2547,7 @@
             const filtered = clocks.filter(c => c.id !== id);
             saveWorldClocks(filtered);
             renderWorldClocks();
+            updateWorldClocksCount();
         }
 
         saveWorldClockBtn.addEventListener('click', addWorldClock);
@@ -1697,6 +2578,126 @@
 
         function saveAlerts(alerts) {
             localStorage.setItem(ALERTS_KEY, JSON.stringify(alerts));
+        }
+
+        // Todo Settings
+        function loadTodoSettings() {
+            const stored = localStorage.getItem(TODO_SETTINGS_KEY);
+            return stored ? JSON.parse(stored) : { archiveDays: 7 };
+        }
+
+        function saveTodoSettings(settings) {
+            localStorage.setItem(TODO_SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        // Search Settings
+        function loadSearchSettings() {
+            const stored = localStorage.getItem(SEARCH_SETTINGS_KEY);
+            return stored ? JSON.parse(stored) : { engine: 'google', showSearchBox: true };
+        }
+
+        function saveSearchSettings(settings) {
+            localStorage.setItem(SEARCH_SETTINGS_KEY, JSON.stringify(settings));
+        }
+
+        function getSearchUrl(engine, query) {
+            const engines = {
+                google: `https://www.google.com/search?q=${encodeURIComponent(query)}`,
+                bing: `https://www.bing.com/search?q=${encodeURIComponent(query)}`,
+                yahoo: `https://search.yahoo.com/search?p=${encodeURIComponent(query)}`,
+                duckduckgo: `https://duckduckgo.com/?q=${encodeURIComponent(query)}`,
+                ecosia: `https://www.ecosia.org/search?q=${encodeURIComponent(query)}`
+            };
+            return engines[engine] || engines.google;
+        }
+
+        function updateSearchBoxVisibility() {
+            const settings = loadSearchSettings();
+            if (searchContainer) {
+                if (settings.showSearchBox) {
+                    searchContainer.classList.remove('hidden');
+                } else {
+                    searchContainer.classList.add('hidden');
+                }
+            }
+            // Update placeholder with search engine name
+            updateSearchPlaceholder(settings.engine || 'google');
+        }
+
+        function updateSearchPlaceholder(engine) {
+            if (searchInput) {
+                const engineNames = {
+                    google: 'Google',
+                    bing: 'Bing',
+                    yahoo: 'Yahoo',
+                    duckduckgo: 'DuckDuckGo',
+                    ecosia: 'Ecosia'
+                };
+                searchInput.placeholder = `Search with ${engineNames[engine] || 'Google'}...`;
+            }
+        }
+
+        function archiveOldCompletedTasks() {
+            const settings = loadTodoSettings();
+            const archiveDays = parseInt(settings.archiveDays) || 0;
+
+            console.log(`Archive check: archiveDays = ${archiveDays}`);
+
+            if (archiveDays <= 0) {
+                console.log('Auto-archive disabled (archiveDays = 0)');
+                return; // Auto-archive disabled
+            }
+
+            const todos = loadTodos();
+            const now = new Date();
+
+            console.log(`Total tasks: ${todos.length}`);
+
+            const filtered = todos.filter(todo => {
+                if (!todo.completed) return true; // Keep incomplete tasks
+
+                // Use deadline date/time as the reference point for archiving
+                if (todo.deadlineDate) {
+                    const deadlineTime = parseDateTime(todo.deadlineDate, todo.deadlineTime || '23:59').getTime();
+                    const cutoffTime = deadlineTime + (archiveDays * 24 * 60 * 60 * 1000);
+                    const shouldKeep = now.getTime() < cutoffTime;
+                    console.log(`Task "${todo.text}": deadline = ${new Date(deadlineTime).toISOString()}, cutoff = ${new Date(cutoffTime).toISOString()}, shouldKeep = ${shouldKeep}`);
+                    return shouldKeep;
+                }
+
+                // If no deadline, use completedAt as fallback
+                if (todo.completedAt) {
+                    const completedTime = new Date(todo.completedAt).getTime();
+                    const cutoffTime = completedTime + (archiveDays * 24 * 60 * 60 * 1000);
+                    return now.getTime() < cutoffTime;
+                }
+
+                // If no deadline and no completedAt, keep it
+                return true;
+            });
+
+            const archivedCount = todos.length - filtered.length;
+            console.log(`Tasks to archive: ${archivedCount}`);
+
+            if (archivedCount > 0) {
+                saveTodos(filtered);
+                console.log(`Archived ${archivedCount} old completed tasks`);
+                return archivedCount;
+            }
+
+            return 0;
+        }
+
+        function markTaskCompleted(id) {
+            const todos = loadTodos();
+            const todo = todos.find(t => t.id === id);
+            if (todo) {
+                todo.completed = true;
+                todo.completedAt = new Date().toISOString();
+                saveTodos(todos);
+                renderTodos();
+                updateCount();
+            }
         }
 
         function formatDateTime(dateStr, timeStr) {
@@ -1929,6 +2930,7 @@
 
             saveTodos(todos);
             renderTodos();
+            updateCount();
             closeTaskModal();
         }
 
@@ -1937,8 +2939,14 @@
             const todo = todos.find(t => t.id === id);
             if (todo) {
                 todo.completed = !todo.completed;
+                if (todo.completed) {
+                    todo.completedAt = new Date().toISOString();
+                } else {
+                    delete todo.completedAt;
+                }
                 saveTodos(todos);
                 renderTodos();
+                updateCount();
             }
         }
 
@@ -1952,6 +2960,7 @@
             saveAlerts(filteredAlerts);
 
             renderTodos();
+            updateCount();
         }
 
         function updateCount() {
@@ -2093,6 +3102,7 @@
 
             saveBookmarks(bookmarks);
             renderBookmarks();
+            updateBookmarksCount();
             closeBookmarkModal();
         }
 
@@ -2101,6 +3111,7 @@
             const filtered = bookmarks.filter(b => b.id !== id);
             saveBookmarks(filtered);
             renderBookmarks();
+            updateBookmarksCount();
         }
 
         saveBookmarkBtn.addEventListener('click', saveBookmark);
@@ -2125,6 +3136,13 @@
         autoLocateBtn = document.getElementById('autoLocateBtn');
         calculationMethod = document.getElementById('calculationMethod');
         asrMethod = document.getElementById('asrMethod');
+        archiveDaysInput = document.getElementById('archiveDaysInput');
+        saveTodoSettingsBtn = document.getElementById('saveTodoSettingsBtn');
+        searchContainer = document.getElementById('searchContainer');
+        searchForm = document.getElementById('searchForm');
+        searchInput = document.getElementById('searchInput');
+        searchEngineSelect = document.getElementById('searchEngineSelect');
+        saveSearchSettingsBtn = document.getElementById('saveSearchSettingsBtn');
         leftSidebar = document.getElementById('leftSidebar');
         rightSidebar = document.getElementById('rightSidebar');
 
@@ -2516,6 +3534,35 @@
             return { name: 'Fajr', time: getPrayerTimeToday('Fajr'), tomorrow: true };
         }
 
+        let lastHighlightedPrayer = null;
+
+        function updatePrayerHighlight() {
+            if (!prayerTimesList || !prayerTimesData) return;
+
+            const now = new Date();
+            const nextPrayer = findNextPrayer(now);
+
+            // Remove highlight from all prayers
+            const allPrayers = prayerTimesList.querySelectorAll('.prayer-item');
+            allPrayers.forEach(prayer => prayer.classList.remove('next-prayer'));
+
+            // Add highlight to the next prayer
+            if (nextPrayer) {
+                const targetPrayer = Array.from(allPrayers).find(el =>
+                    el.querySelector('.prayer-name')?.textContent === nextPrayer.name
+                );
+                if (targetPrayer) {
+                    targetPrayer.classList.add('next-prayer');
+                    lastHighlightedPrayer = nextPrayer.name;
+                }
+
+                // Update countdown display name
+                if (nextPrayerName) {
+                    nextPrayerName.textContent = nextPrayer.name;
+                }
+            }
+        }
+
         function updatePrayerCountdown() {
             if (!nextPrayerName || !nextPrayerTimer) return;
 
@@ -2531,6 +3578,9 @@
 
             if (nextPrayer) {
                 nextPrayerName.textContent = nextPrayer.name;
+
+                // Update the highlight in the prayer list
+                updatePrayerHighlight();
 
                 let targetTime = nextPrayer.time;
                 if (nextPrayer.tomorrow) {
@@ -2549,7 +3599,9 @@
                     const prayerTimeStr = targetTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
                     document.title = `${nextPrayer.name} at ${prayerTimeStr} | Islamic Clock`;
                 } else {
+                    // Prayer time has arrived, refresh prayer times list
                     fetchPrayerTimes();
+                    renderPrayerTimes();
                 }
             }
         }
@@ -2561,8 +3613,22 @@
             calculationMethod.value = settings.method || 2;
             asrMethod.value = settings.asrMethod !== undefined ? settings.asrMethod : 0;
 
+            // Load Todo settings
+            const todoSettings = loadTodoSettings();
+            archiveDaysInput.value = todoSettings.archiveDays || 7;
+
+            // Load Search settings
+            const searchSettings = loadSearchSettings();
+            if (searchEngineSelect) {
+                searchEngineSelect.value = searchSettings.engine || 'google';
+            }
+            updateSearchBoxOptions();
+
             updateThemeOptions();
+            updateClockFormatOptions();
             updateSidebarUI();
+            updateWorldClocksCount();
+            updateBookmarksCount();
 
             settingsModal.classList.add('active');
         }
@@ -2593,6 +3659,49 @@
             prayerTimesData = null;
             fetchPrayerTimes();
             closeSettingsModalFunc();
+        }
+
+        function saveTodoSettingsHandler() {
+            const archiveDays = parseInt(archiveDaysInput.value) || 0;
+
+            const settings = {
+                archiveDays: archiveDays
+            };
+
+            saveTodoSettings(settings);
+            archiveOldCompletedTasks();
+            renderTodos();
+            updateCount();
+            closeSettingsModalFunc();
+        }
+
+        function saveSearchSettingsHandler() {
+            const engine = searchEngineSelect.value;
+            const visibleOption = document.getElementById('searchBoxVisibleYes');
+            const showSearchBox = visibleOption?.classList.contains('active') || false;
+
+            const newSettings = {
+                engine: engine,
+                showSearchBox: showSearchBox
+            };
+
+            saveSearchSettings(newSettings);
+            updateSearchBoxVisibility();
+            closeSettingsModalFunc();
+        }
+
+        function updateSearchBoxOptions() {
+            const settings = loadSearchSettings();
+            const visibleOption = document.getElementById('searchBoxVisibleYes');
+            const hiddenOption = document.getElementById('searchBoxVisibleNo');
+
+            if (settings.showSearchBox) {
+                visibleOption?.classList.add('active');
+                hiddenOption?.classList.remove('active');
+            } else {
+                visibleOption?.classList.remove('active');
+                hiddenOption?.classList.add('active');
+            }
         }
 
         async function autoDetectLocation() {
@@ -2843,7 +3952,43 @@
         openSettingsBtn.addEventListener('click', openSettingsModal);
         closeSettingsBtn.addEventListener('click', closeSettingsModalFunc);
         savePrayerSettingsBtn.addEventListener('click', savePrayerSettingsHandler);
+        saveTodoSettingsBtn.addEventListener('click', saveTodoSettingsHandler);
+        saveSearchSettingsBtn.addEventListener('click', saveSearchSettingsHandler);
         autoLocateBtn.addEventListener('click', autoDetectLocation);
+
+        // Search box visibility toggle options
+        document.getElementById('searchBoxVisibleYes')?.addEventListener('click', function() {
+            document.getElementById('searchBoxVisibleYes').classList.add('active');
+            document.getElementById('searchBoxVisibleNo').classList.remove('active');
+        });
+
+        document.getElementById('searchBoxVisibleNo')?.addEventListener('click', function() {
+            document.getElementById('searchBoxVisibleYes').classList.remove('active');
+            document.getElementById('searchBoxVisibleNo').classList.add('active');
+        });
+
+        // Update placeholder when search engine changes in settings
+        if (searchEngineSelect) {
+            searchEngineSelect.addEventListener('change', (e) => {
+                updateSearchPlaceholder(e.target.value);
+            });
+            // Set initial placeholder
+            updateSearchPlaceholder(searchEngineSelect.value);
+        }
+
+        // Search form event listener
+        if (searchForm) {
+            searchForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query) {
+                    const settings = loadSearchSettings();
+                    const searchUrl = getSearchUrl(settings.engine || 'google', query);
+                    window.open(searchUrl, '_blank');
+                    searchInput.value = '';
+                }
+            });
+        }
 
         settingsModal.addEventListener('click', (e) => {
             if (e.target === settingsModal) {
@@ -2853,12 +3998,14 @@
 
         // Initial renders
         updateSidebarUI();
+        archiveOldCompletedTasks();
         renderTodos();
         renderBookmarks();
         renderWorldClocks();
         updateWorldClocksCount();
         updateBookmarksCount();
         updateClockFormatOptions();
+        updateSearchBoxVisibility();
         fetchPrayerTimes();
         displayHadith();
         initQuranPlayer();
@@ -2891,6 +4038,13 @@
                 }
             });
         }, 60000);
+
+        // Archive old completed tasks every hour
+        setInterval(() => {
+            archiveOldCompletedTasks();
+            renderTodos();
+            updateCount();
+        }, 3600000);
 
         // Request notification permission
         if (Notification.permission === 'default') {

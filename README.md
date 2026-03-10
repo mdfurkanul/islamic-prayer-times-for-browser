@@ -4,6 +4,8 @@ A beautiful, feature-rich dashboard clock designed specifically for Muslims. Thi
 
 ![Theme](https://img.shields.io/badge/theme-dark%2Flight-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Responsive](https://img.shields.io/badge/responsive-desktop%2C%20tablet%2C%20mobile-brightgreen)
+![Search](https://img.shields.io/badge/search-multi--engine-orange)
 
 ## Live Demo
 
@@ -48,9 +50,11 @@ A beautiful, feature-rich dashboard clock designed specifically for Muslims. Thi
 
 ### UI/UX Features
 - **Collapsible Sidebars** - Toggle left (Todo) and right (Prayer) panels
-- **Responsive Design** - Works on desktop and tablets
-- **Settings Modal** - Centralized configuration panel
+- **Fully Responsive Design** - Optimized for desktop, laptop, tablet, and mobile devices
+- **Multi-Engine Search Box** - Quick web search with Google, Bing, Yahoo, DuckDuckGo, or Ecosia
+- **Settings Modal** - Centralized configuration panel with organized tabs
 - **Local Storage** - All preferences saved automatically
+- **Auto-Archive Tasks** - Automatically archive completed tasks after user-defined days
 
 ---
 
@@ -236,6 +240,23 @@ To replace the New Tab page (not just homepage):
    - **Light** - Light theme
 3. Changes apply immediately
 
+### Search Box (Above Clock)
+1. Type your search query in the search box
+2. Press Enter or click the search icon
+3. Results open in a new tab using your selected search engine
+4. To change search engine:
+   - Open Settings (⚙️) > **Others** tab
+   - Select your preferred engine (Google, Bing, Yahoo, DuckDuckGo, Ecosia)
+   - Toggle Show/Hide Search Box
+   - Click **Save Search Settings**
+
+### Auto-Archive Completed Tasks
+1. Open Settings (⚙️) > **Others** tab
+2. Set the number of days to keep completed tasks
+3. Tasks are archived based on their deadline date (not completion date)
+4. Set to 0 to disable auto-archive
+5. Click **Save Todo Settings**
+
 ---
 
 ## Hosting Options
@@ -332,6 +353,15 @@ If you encounter any issues or have suggestions for improvements, feel free to:
 - Open an issue on GitHub
 - Submit a pull request
 - Share with others who might benefit
+
+---
+
+## SEO & Tags
+
+#IslamicClock #PrayerTimes #MuslimDashboard #IslamicApp #SalahTimes #QuranPlayer #TodoList #ProductivityTool #IslamicReminder #MuslimCommunity #PrayerSchedule #DigitalClock #WebApp #OpenSource #FreeTool
+
+**Hashtags:**
+`#IslamicClock` `#PrayerTimes` `#MuslimDashboard` `#SalahTracker` `#QuranRecitation` `#IslamicLifestyle` `#MuslimProductivity` `#DailyPrayers` `#IslamicTools` `#FaithAndTech`
 
 ---
 
