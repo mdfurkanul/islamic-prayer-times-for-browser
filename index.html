@@ -921,6 +921,16 @@
             font-size: 0.9rem;
         }
 
+        .modal-select[size] {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        #citySelect {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
         .modal-select:focus {
             outline: none;
             border-color: var(--text-secondary);
@@ -929,6 +939,7 @@
         .modal-select option {
             background-color: var(--bg-tertiary);
             color: var(--text-primary);
+            padding: 8px;
         }
 
         .location-inputs {
@@ -2002,7 +2013,8 @@
     <div class="modal-overlay" id="worldClockModal">
         <div class="modal">
             <h3>Add World Clock</h3>
-            <select class="modal-select" id="citySelect">
+            <input type="text" class="modal-input" id="citySearchInput" placeholder="Search for a city...">
+            <select class="modal-select" id="citySelect" size="15">
                 <option value="">Select a city...</option>
                 <!-- Middle East -->
                 <option value="Asia/Riyadh">Makkah, Saudi Arabia</option>
@@ -2483,8 +2495,54 @@
         const worldClocksContainer = document.getElementById('worldClocksContainer');
         const worldClockModal = document.getElementById('worldClockModal');
         const citySelect = document.getElementById('citySelect');
+        const citySearchInput = document.getElementById('citySearchInput');
         const saveWorldClockBtn = document.getElementById('saveWorldClockBtn');
         const cancelWorldClockBtn = document.getElementById('cancelWorldClockBtn');
+
+        // Store all city options on page load
+        const allCityOptions = Array.from(citySelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.text
+        }));
+
+        // Filter cities as user types - rebuild the select with only matching options
+        citySearchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase();
+
+            // Clear current options
+            citySelect.innerHTML = '';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Select a city...';
+            citySelect.appendChild(defaultOption);
+
+            // Add matching options
+            allCityOptions.forEach(option => {
+                // Skip the default option which is already added
+                if (!option.value) return;
+
+                if (option.text.toLowerCase().includes(filter)) {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.text = option.text;
+                    citySelect.appendChild(opt);
+                }
+            });
+        });
+
+        // Focus search input when modal opens and handle keyboard navigation
+        citySearchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Select the first visible option (non-default)
+                if (citySelect.options.length > 1 && citySelect.options[1].value) {
+                    citySelect.value = citySelect.options[1].value;
+                    addWorldClock();
+                }
+            }
+        });
 
         function loadWorldClocks() {
             const stored = localStorage.getItem(WORLD_CLOCKS_KEY);
@@ -2558,11 +2616,35 @@
 
         function openWorldClockModal() {
             citySelect.value = '';
+            citySearchInput.value = '';
+            citySearchInput.focus();
             worldClockModal.classList.add('active');
         }
 
         function closeWorldClockModal() {
             worldClockModal.classList.remove('active');
+            citySearchInput.value = '';
+            // Restore all options
+            restoreAllOptions();
+        }
+
+        function restoreAllOptions() {
+            citySelect.innerHTML = '';
+
+            // Add default option
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.text = 'Select a city...';
+            citySelect.appendChild(defaultOption);
+
+            // Add all city options
+            allCityOptions.forEach(option => {
+                if (!option.value) return;
+                const opt = document.createElement('option');
+                opt.value = option.value;
+                opt.text = option.text;
+                citySelect.appendChild(opt);
+            });
         }
 
         function addWorldClock() {
@@ -2590,6 +2672,9 @@
             saveWorldClocks(clocks);
             renderWorldClocks();
             updateWorldClocksCount();
+            citySearchInput.value = '';
+            // Restore all options
+            restoreAllOptions();
             closeWorldClockModal();
         }
 
@@ -2606,6 +2691,13 @@
         worldClockModal.addEventListener('click', (e) => {
             if (e.target === worldClockModal) {
                 closeWorldClockModal();
+            }
+        });
+
+        // Double-click on select to quickly add a city
+        citySelect.addEventListener('dblclick', function() {
+            if (this.value) {
+                addWorldClock();
             }
         });
 
