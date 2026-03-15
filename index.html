@@ -803,6 +803,35 @@
             display: block;
         }
 
+        /* Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 12px 24px;
+            box-shadow: 0 4px 20px var(--shadow-color);
+            z-index: 9999;
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            max-width: 90%;
+            width: auto;
+        }
+
+        .toast-container.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-message {
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
         .prayer-location {
             color: var(--text-muted);
             font-size: 0.7rem;
@@ -1943,8 +1972,8 @@
 
         <div class="prayer-scroll-container">
             <div class="prayer-countdown">
-                <div class="prayer-countdown-label">Next Prayer</div>
-                <div class="prayer-countdown-name" id="nextPrayerName">--</div>
+                <div class="prayer-countdown-name" id="currentPrayerName">--</div>
+                <div class="prayer-countdown-label" id="prayerCountdownLabel">ends in</div>
                 <div class="prayer-countdown-timer" id="nextPrayerTimer">--:--:--</div>
             </div>
 
@@ -2326,6 +2355,11 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer">
+        <div class="toast-message" id="toastMessage"></div>
+    </div>
+
     <script>
         // Storage keys
         const STORAGE_KEY = 'todoList';
@@ -2341,7 +2375,7 @@
         const SEARCH_SETTINGS_KEY = 'searchSettings';
 
         // DOM Elements
-        let prayerTimesList, nextPrayerName, nextPrayerTimer, prayerLocation;
+        let prayerTimesList, currentPrayerName, nextPrayerTimer, prayerLocation;
         let settingsModal, openSettingsBtn, closeSettingsBtn, savePrayerSettingsBtn;
         let prayerLatitude, prayerLongitude, autoLocateBtn, calculationMethod, asrMethod;
         let archiveDaysInput, saveTodoSettingsBtn;
@@ -3267,7 +3301,7 @@
 
         // Prayer Times
         prayerTimesList = document.getElementById('prayerTimesList');
-        nextPrayerName = document.getElementById('nextPrayerName');
+        currentPrayerName = document.getElementById('currentPrayerName');
         nextPrayerTimer = document.getElementById('nextPrayerTimer');
         prayerLocation = document.getElementById('prayerLocation');
         settingsModal = document.getElementById('settingsModal');
@@ -3434,6 +3468,69 @@
             const playingIndicator = document.getElementById('playingIndicator');
             const quranLoop = document.getElementById('quranLoop');
             const quranAutoNext = document.getElementById('quranAutoNext');
+            const toastContainer = document.getElementById('toastContainer');
+            const toastMessage = document.getElementById('toastMessage');
+
+            // BroadcastChannel for cross-tab communication
+            const audioChannel = new BroadcastChannel('quran_audio_channel');
+
+            // Show toast notification
+            function showToast(message) {
+                toastMessage.textContent = message;
+                toastContainer.classList.add('show');
+                setTimeout(() => {
+                    toastContainer.classList.remove('show');
+                }, 3000);
+            }
+
+            // Check if audio is playing in another tab
+            function isAudioPlayingInOtherTab() {
+                return new Promise((resolve) => {
+                    audioChannel.postMessage({ type: 'CHECK_STATUS' });
+                    const timeout = setTimeout(() => resolve(false), 500);
+                    audioChannel.onmessage = (event) => {
+                        if (event.data.type === 'STATUS_RESPONSE' && event.data.playing) {
+                            clearTimeout(timeout);
+                            resolve(true);
+                        } else if (event.data.type === 'STATUS_RESPONSE' && !event.data.playing) {
+                            clearTimeout(timeout);
+                            resolve(false);
+                        }
+                    };
+                });
+            }
+
+            // Notify other tabs about audio state change
+            function broadcastAudioState(playing, surah = null, currentTime = null) {
+                audioChannel.postMessage({
+                    type: 'AUDIO_STATE',
+                    playing: playing,
+                    surah: surah,
+                    currentTime: currentTime
+                });
+            }
+
+            // Handle messages from other tabs
+            audioChannel.onmessage = (event) => {
+                const { type, playing, surah, currentTime } = event.data;
+
+                if (type === 'CHECK_STATUS') {
+                    // Respond with current status
+                    audioChannel.postMessage({
+                        type: 'STATUS_RESPONSE',
+                        playing: !quranAudio.paused,
+                        surah: surahSelect.value,
+                        currentTime: quranAudio.currentTime
+                    });
+                } else if (type === 'AUDIO_STATE') {
+                    // Sync with other tab - pause if they're playing
+                    if (playing && quranAudio !== event.source) {
+                        if (!quranAudio.paused) {
+                            quranAudio.pause();
+                        }
+                    }
+                }
+            };
 
             // Populate Surah dropdown
             surahNames.forEach((name, index) => {
@@ -3458,7 +3555,7 @@
                             quranAudio.addEventListener('loadedmetadata', () => {
                                 quranAudio.currentTime = state.currentTime;
                                 if (state.wasPlaying) {
-                                    quranAudio.play().catch(e => console.log('Auto-play prevented:', e));
+                                    // Don't auto-play, just restore position
                                 }
                             }, { once: true });
                         }
@@ -3479,21 +3576,34 @@
             }
 
             // Handle Surah selection
-            surahSelect.addEventListener('change', () => {
+            surahSelect.addEventListener('change', async () => {
                 const surahNum = surahSelect.value;
                 if (surahNum) {
+                    // Check if audio is playing in another tab
+                    const playingInOtherTab = await isAudioPlayingInOtherTab();
+                    if (playingInOtherTab) {
+                        showToast('Audio is already playing in another tab');
+                        surahSelect.value = '';
+                        return;
+                    }
+
                     // Use Alafasy recitation from alquran.cloud API
                     quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surahNum}.mp3`;
                     quranAudio.style.display = 'block';
-                    quranAudio.play().catch(e => {
+                    quranAudio.play().then(() => {
+                        broadcastAudioState(true, surahNum, 0);
+                    }).catch(e => {
                         console.log('Audio playback failed:', e);
                         // Fallback to second source
                         quranAudio.src = `https://server8.mp3quran.net/afs/${String(surahNum).padStart(3, '0')}.mp3`;
-                        quranAudio.play();
+                        quranAudio.play().then(() => {
+                            broadcastAudioState(true, surahNum, 0);
+                        });
                     });
                 } else {
                     quranAudio.style.display = 'none';
                     quranAudio.pause();
+                    broadcastAudioState(false);
                 }
             });
 
@@ -3501,11 +3611,13 @@
             quranAudio.addEventListener('play', () => {
                 playingIndicator.classList.add('active');
                 saveQuranState();
+                broadcastAudioState(true, surahSelect.value, quranAudio.currentTime);
             });
 
             quranAudio.addEventListener('pause', () => {
                 playingIndicator.classList.remove('active');
                 saveQuranState();
+                broadcastAudioState(false);
             });
 
             // Save position periodically during playback
@@ -3516,6 +3628,7 @@
             // Handle end - loop or play next
             quranAudio.addEventListener('ended', () => {
                 playingIndicator.classList.remove('active');
+                broadcastAudioState(false);
 
                 // Check if loop is enabled
                 if (quranLoop.checked) {
@@ -3532,10 +3645,14 @@
                         const nextSurah = currentSurah + 1;
                         surahSelect.value = nextSurah;
                         quranAudio.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${nextSurah}.mp3`;
-                        quranAudio.play().catch(e => {
+                        quranAudio.play().then(() => {
+                            broadcastAudioState(true, nextSurah, 0);
+                        }).catch(e => {
                             console.log('Audio playback failed:', e);
                             quranAudio.src = `https://server8.mp3quran.net/afs/${String(nextSurah).padStart(3, '0')}.mp3`;
-                            quranAudio.play();
+                            quranAudio.play().then(() => {
+                                broadcastAudioState(true, nextSurah, 0);
+                            });
                         });
                     }
                 }
@@ -3625,15 +3742,15 @@
                 { name: 'Isha', key: 'Isha' }
             ];
 
-            const nextPrayer = findNextPrayer(new Date());
+            const currentPrayer = findCurrentPrayer(new Date());
 
             let html = '';
             prayers.forEach(prayer => {
                 const time12 = convertTo12Hour(prayerTimesData[prayer.key]);
-                const isNext = nextPrayer && nextPrayer.name === prayer.name;
+                const isCurrent = currentPrayer && currentPrayer.name === prayer.name;
 
                 let className = 'prayer-item';
-                if (isNext) className += ' next-prayer';
+                if (isCurrent) className += ' next-prayer';
 
                 html += `<div class="${className}">
                     <span class="prayer-name">${prayer.name}</span>
@@ -3677,53 +3794,71 @@
             return { name: 'Fajr', time: getPrayerTimeToday('Fajr'), tomorrow: true };
         }
 
+        function findCurrentPrayer(now) {
+            if (!prayerTimesData) return null;
+
+            const prayers = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+            let currentPrayer = null;
+
+            for (const prayer of prayers) {
+                const prayerTime = getPrayerTimeToday(prayer);
+                if (prayerTime && prayerTime <= now) {
+                    currentPrayer = { name: prayer, time: prayerTime };
+                }
+            }
+
+            // If no prayer has passed today, the current prayer is Isha from yesterday
+            if (!currentPrayer) {
+                currentPrayer = { name: 'Isha', time: getPrayerTimeToday('Isha'), yesterday: true };
+            }
+
+            return currentPrayer;
+        }
+
         let lastHighlightedPrayer = null;
 
         function updatePrayerHighlight() {
             if (!prayerTimesList || !prayerTimesData) return;
 
             const now = new Date();
-            const nextPrayer = findNextPrayer(now);
+            const currentPrayer = findCurrentPrayer(now);
 
             // Remove highlight from all prayers
             const allPrayers = prayerTimesList.querySelectorAll('.prayer-item');
             allPrayers.forEach(prayer => prayer.classList.remove('next-prayer'));
 
-            // Add highlight to the next prayer
-            if (nextPrayer) {
+            // Add highlight to the current prayer
+            if (currentPrayer) {
                 const targetPrayer = Array.from(allPrayers).find(el =>
-                    el.querySelector('.prayer-name')?.textContent === nextPrayer.name
+                    el.querySelector('.prayer-name')?.textContent === currentPrayer.name
                 );
                 if (targetPrayer) {
                     targetPrayer.classList.add('next-prayer');
-                    lastHighlightedPrayer = nextPrayer.name;
-                }
-
-                // Update countdown display name
-                if (nextPrayerName) {
-                    nextPrayerName.textContent = nextPrayer.name;
+                    lastHighlightedPrayer = currentPrayer.name;
                 }
             }
         }
 
         function updatePrayerCountdown() {
-            if (!nextPrayerName || !nextPrayerTimer) return;
+            if (!currentPrayerName || !nextPrayerTimer) return;
 
             if (!prayerTimesData) {
-                nextPrayerName.textContent = '--';
+                currentPrayerName.textContent = '--';
                 nextPrayerTimer.textContent = '--:--:--';
                 document.title = 'Islamic Clock';
                 return;
             }
 
             const now = new Date();
+            const currentPrayer = findCurrentPrayer(now);
             const nextPrayer = findNextPrayer(now);
 
-            if (nextPrayer) {
-                nextPrayerName.textContent = nextPrayer.name;
+            // Update the highlight in the prayer list
+            updatePrayerHighlight();
 
-                // Update the highlight in the prayer list
-                updatePrayerHighlight();
+            if (currentPrayer && nextPrayer) {
+                // Update the current prayer name display
+                currentPrayerName.textContent = currentPrayer.name;
 
                 let targetTime = nextPrayer.time;
                 if (nextPrayer.tomorrow) {
@@ -3738,9 +3873,9 @@
                     const countdownText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                     nextPrayerTimer.textContent = countdownText;
 
-                    // Update browser title with next prayer name and time
+                    // Update browser title with current prayer name and time for next prayer
                     const prayerTimeStr = targetTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                    document.title = `${nextPrayer.name} at ${prayerTimeStr} | Islamic Clock`;
+                    document.title = `${nextPrayer.name} in ${countdownText} | Islamic Clock`;
                 } else {
                     // Prayer time has arrived, refresh prayer times list
                     fetchPrayerTimes();
